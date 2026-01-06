@@ -128,8 +128,11 @@ GITHUB_REPO = "0xgruber/linux-health-checks"
 VERSION_CHECK_TIMEOUT = 3
 
 # Disable version checking entirely
-# Set to "1" to skip version checks (can also use environment variable)
-# DISABLE_VERSION_CHECK = "0"
+# NOTE: Currently, disabling version checks is controlled *only* via the
+#       DISABLE_VERSION_CHECK environment variable. Setting it in this file
+#       has no effect with the current script implementation; this line is
+#       provided for documentation/future use.
+# Example (no effect in this file): DISABLE_VERSION_CHECK = "1"
 
 # ============================================================================
 # ADVANCED CONFIGURATION
