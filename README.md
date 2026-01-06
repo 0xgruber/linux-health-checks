@@ -187,10 +187,12 @@ Edit the constants at the top of `linux_health_check.py` (lines 20-40) before ru
 ### Output Directory
 ```python
 OUTPUT_DIR = "/root" if os.geteuid() == 0 else "/tmp"
-OUTPUT = f"{OUTPUT_DIR}/health_report.txt"
+OUTPUT_FILE = os.path.join(OUTPUT_DIR, "health_report.txt")
 ```
-- Root users: logs to `/root/health_report.txt`
-- Non-root users: logs to `/tmp/health_report.txt`
+- Root users: Files written to `/root/`
+- Non-root users: Files written to `/tmp/`
+- Execution log: `health_report.txt` (diagnostic logging)
+- Health report: `health_report_{hostname}.{ext}` (primary output, format based on EXPORT_FORMAT)
 
 ### Email Configuration
 ```python
@@ -259,9 +261,24 @@ nano linux_health_check.py  # or vim, vi, etc.
 sudo ./linux_health_check.py
 ```
 
-**As non-root** (limited visibility, logs to /tmp):
+**As non-root** (limited visibility, writes to /tmp):
 ```bash
 ./linux_health_check.py
+```
+
+**Choose output format** (default: markdown):
+```bash
+# Markdown format (default)
+./linux_health_check.py
+
+# JSON format (machine-readable)
+EXPORT_FORMAT=json ./linux_health_check.py
+
+# XML format (enterprise systems)
+EXPORT_FORMAT=xml ./linux_health_check.py
+
+# Plain text format (simple parsing)
+EXPORT_FORMAT=text ./linux_health_check.py
 ```
 
 ### What Happens During Execution
@@ -274,7 +291,7 @@ sudo ./linux_health_check.py
 6. **Networking** - Tests firewall, ports, NTP, DNS, interface stats
 7. **iSCSI** - Verifies service, sessions, targets, logs
 8. **Issue Summary** - Displays table of findings by severity
-9. **Auto-Export** - Creates timestamped Markdown report in `OUTPUT_DIR`
+9. **Report Generation** - Creates structured report in chosen format (default: Markdown)
 10. **Email** - Optionally encrypts and sends report (if configured)
 
 ### Example Output
@@ -311,30 +328,50 @@ Issue summary table at end:
 
 ## Output Artifacts
 
-### Primary Log
+### Execution Log (Diagnostic)
 - **Location**: `/root/health_report.txt` (root) or `/tmp/health_report.txt` (non-root)
-- **Format**: Plain text with markdown-style headers
-- **Contains**: All check output, PASS/FAIL status, issue details
+- **Format**: Plain text Python logging output (INFO, WARNING, ERROR messages)
+- **Contains**: Timestamped execution trace of all checks performed
+- **Purpose**: Debugging and audit trail of script execution
 
-### Exported Reports
-Automatic export creates timestamped files in `OUTPUT_DIR`:
+### Health Check Report (Primary Output)
+Automatically generated in the format specified by `EXPORT_FORMAT` environment variable (default: markdown):
 
-- **Markdown**: `health_report_export_YYYYMMDD_HHMMSS.md` (default)
-  - Formatted tables, severity emoji, code blocks
+- **Markdown** (default): `health_report_{hostname}.md`
+  - Formatted tables, severity emoji (🔴🟠🟡🔵ℹ️), code blocks
   - GitHub-compatible markdown
+  - Best for human readability and documentation
   
-- **JSON**: `health_report_export_YYYYMMDD_HHMMSS.json`
+- **JSON**: `health_report_{hostname}.json`
   - Machine-readable structured data
-  - Includes metadata (hostname, distro, timestamp)
-  - Array of issues with severity/category/details
+  - Includes metadata (hostname, distro, timestamp, OS info)
+  - Array of issues with severity/category/details/timestamp
+  - Best for automation and integrations
   
-- **XML**: `health_report_export_YYYYMMDD_HHMMSS.xml`
+- **XML**: `health_report_{hostname}.xml`
   - XML tree with metadata and issues elements
   - Schema: `<health_check_report><metadata>...<issues>...`
+  - Best for enterprise systems and legacy integrations
   
-- **Plain Text**: `health_report_export_YYYYMMDD_HHMMSS.txt`
+- **Plain Text**: `health_report_{hostname}.txt`
   - Formatted report without markdown syntax
   - Suitable for email body or terminal viewing
+  - Best for simple text processing
+
+**Usage:**
+```bash
+# Default (Markdown)
+./linux_health_check.py
+
+# JSON output
+EXPORT_FORMAT=json ./linux_health_check.py
+
+# XML output
+EXPORT_FORMAT=xml ./linux_health_check.py
+
+# Plain text output
+EXPORT_FORMAT=text ./linux_health_check.py
+```
 
 ### GPG Encrypted Files
 When `GPG_ENABLED=True` and `GPG_RECIPIENT` is set:
