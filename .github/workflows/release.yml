@@ -84,6 +84,7 @@ jobs:
         run: |
           mkdir -p release
           cp linux_health_check.py release/
+          cp health_check.cfg.example release/
           cp README.md release/
           cp -r openspec release/ || true
           cd release
@@ -114,9 +115,14 @@ jobs:
             
             ## Installation
             ```bash
-            # Download and make executable
+            # Download script and example config
             wget https://github.com/${{ github.repository }}/releases/download/${{ steps.version.outputs.tag }}/linux_health_check.py
+            wget https://github.com/${{ github.repository }}/releases/download/${{ steps.version.outputs.tag }}/health_check.cfg.example
             chmod +x linux_health_check.py
+            
+            # Optional: Set up configuration file
+            cp health_check.cfg.example health_check.cfg
+            nano health_check.cfg
             
             # Or extract from archive
             tar -xzf linux-health-check-${{ steps.version.outputs.version }}.tar.gz
@@ -134,6 +140,7 @@ jobs:
             See [README.md](https://github.com/${{ github.repository }}/blob/main/README.md) for complete documentation.
           files: |
             linux_health_check.py
+            health_check.cfg.example
             linux-health-check-${{ steps.version.outputs.version }}.tar.gz
             linux-health-check-${{ steps.version.outputs.version }}.zip
             checksums.txt
