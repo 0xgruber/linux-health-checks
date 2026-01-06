@@ -29,37 +29,110 @@ import urllib.error
 # ============================================================================
 # CONFIGURATION
 # ============================================================================
+#
+# You can customize these settings by creating a health_check_config.py file
+# in the same directory as this script. See health_check_config.example.py
+# for a template with all available options.
+#
+# The script will load settings from health_check_config.py if it exists,
+# otherwise it will use the defaults below.
+#
+# Configuration priority: Environment Variables > Config File > Defaults
+# ============================================================================
 
-OUTPUT_DIR = "/root" if os.geteuid() == 0 else "/tmp"
+# Try to load user configuration
+try:
+    import importlib.util
+    import stat
+
+    _script_dir = os.path.dirname(os.path.abspath(__file__))
+    _config_file = os.path.join(_script_dir, "health_check_config.py")
+
+    if os.path.exists(_config_file):
+        # Check file permissions
+        _file_stat = os.stat(_config_file)
+        if _file_stat.st_mode & (stat.S_IRGRP | stat.S_IROTH):
+            print("⚠️  WARNING: Config file is readable by others")
+            print("   Consider: chmod 600 health_check_config.py")
+
+        # Load config module
+        _spec = importlib.util.spec_from_file_location(
+            "health_check_config", _config_file
+        )
+        if _spec and _spec.loader:
+            _config = importlib.util.module_from_spec(_spec)
+            _spec.loader.exec_module(_config)
+            print(f"✓ Loaded configuration from: {_config_file}")
+            _has_config = True
+        else:
+            _has_config = False
+    else:
+        print("ℹ️  No config file found, using defaults")
+        print(f"   Create {_config_file} to customize settings")
+        _has_config = False
+except Exception as _e:
+    print(f"⚠️  WARNING: Error loading config: {_e}")
+    print("   Using default configuration")
+    _has_config = False
+
+
+def _cfg(key: str, default):
+    """Get config value from env, config file, or default."""
+    # Priority 1: Environment variable
+    env_val = os.getenv(key)
+    if env_val is not None:
+        if isinstance(default, bool):
+            return env_val.lower() in ("true", "1", "yes")
+        elif isinstance(default, int):
+            try:
+                return int(env_val)
+            except ValueError:
+                return default
+        elif isinstance(default, float):
+            try:
+                return float(env_val)
+            except ValueError:
+                return default
+        return env_val
+
+    # Priority 2: Config file
+    if _has_config and hasattr(_config, key):
+        return getattr(_config, key)
+
+    # Priority 3: Default
+    return default
+
+
+OUTPUT_DIR = _cfg("OUTPUT_DIR", "/root" if os.geteuid() == 0 else "/tmp")
 OUTPUT_FILE = os.path.join(OUTPUT_DIR, "health_report.txt")
 
-# Email Configuration (set to None to disable)
-EMAIL_ENABLED = False
-EMAIL_TO = None  # "admin@example.com"
-EMAIL_FROM = None  # "health-check@example.com"
-EMAIL_SUBJECT = "Linux Health Check Report - {hostname}"
+# Email Configuration
+EMAIL_ENABLED = _cfg("EMAIL_ENABLED", False)
+EMAIL_TO = _cfg("EMAIL_TO", None)
+EMAIL_FROM = _cfg("EMAIL_FROM", None)
+EMAIL_SUBJECT = _cfg("EMAIL_SUBJECT", "Linux Health Check Report - {hostname}")
 
 # SMTP Configuration
-SMTP_SERVER = None  # "smtp.example.com"
-SMTP_PORT = 587
-SMTP_USE_TLS = True
-SMTP_USERNAME = None
-SMTP_PASSWORD = None
+SMTP_SERVER = _cfg("SMTP_SERVER", None)
+SMTP_PORT = _cfg("SMTP_PORT", 587)
+SMTP_USE_TLS = _cfg("SMTP_USE_TLS", True)
+SMTP_USERNAME = _cfg("SMTP_USERNAME", None)
+SMTP_PASSWORD = _cfg("SMTP_PASSWORD", None)
 
-# GPG Configuration (set to None to disable encryption)
-GPG_ENABLED = False
-GPG_RECIPIENT = None  # "admin@example.com"
+# GPG Configuration
+GPG_ENABLED = _cfg("GPG_ENABLED", False)
+GPG_RECIPIENT = _cfg("GPG_RECIPIENT", None)
 
 # Policy Thresholds
-FILESYSTEM_WARNING_THRESHOLD = 85
-FILESYSTEM_CRITICAL_THRESHOLD = 98
-MEMORY_WARNING_THRESHOLD = 85
-MEMORY_CRITICAL_THRESHOLD = 95
-LOAD_WARNING_MULTIPLIER = 0.7
-LOAD_CRITICAL_MULTIPLIER = 1.0
+FILESYSTEM_WARNING_THRESHOLD = _cfg("FILESYSTEM_WARNING_THRESHOLD", 85)
+FILESYSTEM_CRITICAL_THRESHOLD = _cfg("FILESYSTEM_CRITICAL_THRESHOLD", 98)
+MEMORY_WARNING_THRESHOLD = _cfg("MEMORY_WARNING_THRESHOLD", 85)
+MEMORY_CRITICAL_THRESHOLD = _cfg("MEMORY_CRITICAL_THRESHOLD", 95)
+LOAD_WARNING_MULTIPLIER = _cfg("LOAD_WARNING_MULTIPLIER", 0.7)
+LOAD_CRITICAL_MULTIPLIER = _cfg("LOAD_CRITICAL_MULTIPLIER", 1.0)
 
 # Version Checking Configuration
-GITHUB_REPO = "0xgruber/linux-health-checks"
+GITHUB_REPO = _cfg("GITHUB_REPO", "0xgruber/linux-health-checks")
 timeout_env = os.getenv("VERSION_CHECK_TIMEOUT")
 try:
     VERSION_CHECK_TIMEOUT = int(timeout_env) if timeout_env is not None else 3
