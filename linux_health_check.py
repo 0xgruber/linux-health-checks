@@ -3,9 +3,10 @@
 Linux Health Check Script
 Author: System Administrator
 Description: Comprehensive health and security audit for Linux systems
-Version: 2026.01.05
 License: MIT
 """
+
+__version__ = "1.0.0"
 
 import os
 import sys

@@ -1,6 +1,6 @@
 # Linux Health Checks
 
-[![Version](https://img.shields.io/badge/version-2026.01.05-blue.svg)](https://github.com/0xgruber/linux-health-checks/releases)
+[![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](https://github.com/0xgruber/linux-health-checks/releases)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/python-3.8%2B-blue.svg)](https://www.python.org/)
 [![Debian](https://img.shields.io/badge/Debian-12%20%7C%2013-red.svg)](https://www.debian.org/)
@@ -12,7 +12,7 @@
 Comprehensive cross-distribution health and security audit script for Linux servers. The script performs 35+ distinct checks across security, system health, storage, packages, networking, and iSCSI, ranks findings by severity (Critical/High/Medium/Low/Info), and produces exportable reports with optional GPG encryption and email delivery.
 
 **Author:** Aaron Gruber <aaron@gizmobear.io>  
-**Version:** 2026.01.05 (Date-based versioning: YYYY.MM.DD)  
+**Version:** 1.0.0 ([Semantic Versioning](https://semver.org/))  
 **License:** MIT  
 **Repository:** https://github.com/0xgruber/linux-health-checks
 
@@ -126,13 +126,19 @@ chmod +x linux_health_check.py
 sudo ./linux_health_check.py
 ```
 
-### Release Versioning
+### Versioning
 
-This project uses **date-based versioning** in the format `YYYY.MM.DD` (e.g., `2026.01.05`). 
+This project follows **[Semantic Versioning 2.0.0](https://semver.org/)** (SemVer).
 
-- New releases are automatically created via GitHub Actions
-- Each release includes the script, archives (tar.gz, zip), and checksums
-- View all releases: https://github.com/0xgruber/linux-health-checks/releases
+**Format:** `MAJOR.MINOR.PATCH` (e.g., `1.0.0`)
+
+- **MAJOR** version (X.0.0): Breaking changes, incompatible API changes
+- **MINOR** version (1.X.0): New features, backward-compatible functionality
+- **PATCH** version (1.0.X): Bug fixes, security patches, documentation updates
+
+**Current Version:** 1.0.0 (First stable release)
+
+View all releases and changelog: https://github.com/0xgruber/linux-health-checks/releases
 
 ## Requirements
 
@@ -588,14 +594,16 @@ Found a bug or have a feature request?
 
 ## Releases
 
-This project uses automated date-based releases (YYYY.MM.DD format). View all releases at:
+This project uses [Semantic Versioning](https://semver.org/) for releases. View all releases at:
 https://github.com/0xgruber/linux-health-checks/releases
 
 Each release includes:
-- Standalone script file
+- Standalone script file (`linux_health_check.py`)
 - Source code archives (tar.gz, zip)
 - SHA256 checksums
-- Release notes with changes
+- Detailed changelog with all changes
+
+**Release Process:** See [CONTRIBUTING.md](CONTRIBUTING.md) for version bumping guidelines.
 
 ## Future Enhancements
 

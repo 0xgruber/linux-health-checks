@@ -4,13 +4,6 @@ on:
   push:
     tags:
       - 'v*'
-  workflow_dispatch:
-    inputs:
-      create_release:
-        description: 'Create a new release with today''s date'
-        required: true
-        type: boolean
-        default: true
 
 permissions:
   contents: write
@@ -30,31 +23,38 @@ jobs:
         with:
           python-version: '3.8'
       
-      - name: Generate date-based version
+      - name: Extract version from tag
         id: version
         run: |
           if [[ "${{ github.ref }}" == refs/tags/v* ]]; then
             VERSION="${GITHUB_REF#refs/tags/v}"
+            echo "version=$VERSION" >> $GITHUB_OUTPUT
+            echo "tag=v$VERSION" >> $GITHUB_OUTPUT
+            echo "✓ Release version: $VERSION"
           else
-            VERSION=$(date +%Y.%m.%d)
+            echo "✗ Error: This workflow must be triggered by a version tag (v*)"
+            exit 1
           fi
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
-          echo "tag=v$VERSION" >> $GITHUB_OUTPUT
-          echo "Release version: $VERSION"
       
-      - name: Update script version
+      - name: Verify version consistency
         run: |
-          sed -i "s/Version: .*/Version: ${{ steps.version.outputs.version }}/" linux_health_check.py
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add linux_health_check.py
-          git diff --staged --quiet || git commit -m "chore: update version to ${{ steps.version.outputs.version }}"
-      
-      - name: Create Git tag
-        if: github.event_name == 'workflow_dispatch'
-        run: |
-          git tag ${{ steps.version.outputs.tag }}
-          git push origin ${{ steps.version.outputs.tag }}
+          SCRIPT_VERSION=$(grep -oP '__version__ = "\K[^"]+' linux_health_check.py)
+          TAG_VERSION="${{ steps.version.outputs.version }}"
+          
+          echo "Script __version__: $SCRIPT_VERSION"
+          echo "Git tag version:    $TAG_VERSION"
+          
+          if [ "$SCRIPT_VERSION" != "$TAG_VERSION" ]; then
+            echo ""
+            echo "⚠️  WARNING: Version mismatch detected!"
+            echo "   Script version ($SCRIPT_VERSION) doesn't match tag ($TAG_VERSION)"
+            echo "   This may cause confusion but won't block the release."
+            echo "   Please update __version__ in linux_health_check.py for future releases."
+            echo ""
+            # Continue anyway (warn but don't fail)
+          else
+            echo "✓ Version verified: $SCRIPT_VERSION matches tag"
+          fi
       
       - name: Generate changelog
         id: changelog

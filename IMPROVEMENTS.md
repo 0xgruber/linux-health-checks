@@ -305,8 +305,8 @@ When considering which improvements to implement, we evaluate based on:
 - **Minor releases**: New features, non-breaking enhancements
 - **Patch releases**: Bug fixes, minor improvements
 
-Date-based versioning: `YYYY.MM.DD` (e.g., 2026.01.05)
+Semantic Versioning: `MAJOR.MINOR.PATCH` following [SemVer 2.0.0](https://semver.org/)
 
 ---
 
-*Last updated: 2026-01-05*
+*Last updated: 2026-01-06*

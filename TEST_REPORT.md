@@ -4,7 +4,7 @@
 **Tester:** OpenCode AI Assistant  
 **Test Environment:** Pop!_OS 24.04 (Ubuntu-based)  
 **Python Version:** 3.12  
-**Script Version:** 2026.01.05
+**Script Version:** 1.0.0
 
 ## Executive Summary
 
