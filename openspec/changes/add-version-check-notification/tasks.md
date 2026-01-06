@@ -7,14 +7,14 @@ Implementation tasks for Feature #6: Automated Update Checking. This change adds
 
 ---
 
-## Phase 1: Version Comparison Logic ⏳
+## Phase 1: Version Comparison Logic ✅
 
 ### Task 1.1: Implement `parse_semantic_version()` function
-- [ ] Create function to parse version strings (e.g., "1.2.3" or "v1.2.3")
-- [ ] Strip 'v' prefix if present
-- [ ] Split on '.' and convert to tuple of integers
-- [ ] Handle invalid formats gracefully (return None or raise ValueError)
-- [ ] Add docstring with examples
+- [x] Create function to parse version strings (e.g., "1.2.3" or "v1.2.3")
+- [x] Strip 'v' prefix if present
+- [x] Split on '.' and convert to tuple of integers
+- [x] Handle invalid formats gracefully (return None or raise ValueError)
+- [x] Add docstring with examples
 
 **Acceptance Criteria**:
 - Parses "1.2.3" → (1, 2, 3)
@@ -23,11 +23,11 @@ Implementation tasks for Feature #6: Automated Update Checking. This change adds
 - Returns None or raises error for invalid input
 
 ### Task 1.2: Implement `compare_versions()` function
-- [ ] Create function to compare two version tuples
-- [ ] Return -1 if current < latest (update available)
-- [ ] Return 0 if current == latest (up to date)
-- [ ] Return 1 if current > latest (dev/future version)
-- [ ] Use Python tuple comparison for MAJOR.MINOR.PATCH
+- [x] Create function to compare two version tuples
+- [x] Return -1 if current < latest (update available)
+- [x] Return 0 if current == latest (up to date)
+- [x] Return 1 if current > latest (dev/future version)
+- [x] Use Python tuple comparison for MAJOR.MINOR.PATCH
 
 **Acceptance Criteria**:
 - compare_versions((1, 0, 0), (1, 1, 0)) → -1
@@ -35,11 +35,11 @@ Implementation tasks for Feature #6: Automated Update Checking. This change adds
 - compare_versions((1, 2, 0), (1, 1, 0)) → 1
 
 ### Task 1.3: Add unit tests for version comparison
-- [ ] Test parse_semantic_version with valid inputs
-- [ ] Test parse_semantic_version with invalid inputs
-- [ ] Test compare_versions with various version combinations
-- [ ] Test edge cases (0.0.0, large version numbers)
-- [ ] Document test cases in comments
+- [x] Test parse_semantic_version with valid inputs
+- [x] Test parse_semantic_version with invalid inputs
+- [x] Test compare_versions with various version combinations
+- [x] Test edge cases (0.0.0, large version numbers)
+- [x] Document test cases in comments
 
 **Acceptance Criteria**:
 - All tests pass
@@ -48,14 +48,14 @@ Implementation tasks for Feature #6: Automated Update Checking. This change adds
 
 ---
 
-## Phase 2: GitHub API Integration 🔌
+## Phase 2: GitHub API Integration ✅
 
 ### Task 2.1: Implement `check_github_releases()` function
-- [ ] Create function to fetch latest release from GitHub API
-- [ ] Use `urllib.request.Request` (stdlib only, no requests library)
-- [ ] Set User-Agent header to 'linux-health-check/VERSION'
-- [ ] Return tuple: (latest_version, release_url, changelog_url)
-- [ ] Return (None, None, None) on any error
+- [x] Create function to fetch latest release from GitHub API
+- [x] Use `urllib.request.Request` (stdlib only, no requests library)
+- [x] Set User-Agent header to 'linux-health-check/VERSION'
+- [x] Return tuple: (latest_version, release_url, changelog_url)
+- [x] Return (None, None, None) on any error
 
 **Acceptance Criteria**:
 - Successfully fetches from: https://api.github.com/repos/0xgruber/linux-health-checks/releases/latest
@@ -64,10 +64,10 @@ Implementation tasks for Feature #6: Automated Update Checking. This change adds
 - Returns valid URLs
 
 ### Task 2.2: Implement timeout handling
-- [ ] Add VERSION_CHECK_TIMEOUT constant (default: 3 seconds)
-- [ ] Read from environment variable: VERSION_CHECK_TIMEOUT
-- [ ] Pass timeout parameter to urllib.request.urlopen()
-- [ ] Log timeout errors at debug level
+- [x] Add VERSION_CHECK_TIMEOUT constant (default: 3 seconds)
+- [x] Read from environment variable: VERSION_CHECK_TIMEOUT
+- [x] Pass timeout parameter to urllib.request.urlopen()
+- [x] Log timeout errors at debug level
 
 **Acceptance Criteria**:
 - Request times out after 3 seconds by default
@@ -75,11 +75,11 @@ Implementation tasks for Feature #6: Automated Update Checking. This change adds
 - No error messages shown to user on timeout
 
 ### Task 2.3: Handle API errors gracefully
-- [ ] Catch URLError (network failures)
-- [ ] Catch HTTPError (404, 403, etc.)
-- [ ] Catch JSONDecodeError (invalid response)
-- [ ] Log all errors at debug level only
-- [ ] Return (None, None, None) for all error cases
+- [x] Catch URLError (network failures)
+- [x] Catch HTTPError (404, 403, etc.)
+- [x] Catch JSONDecodeError (invalid response)
+- [x] Log all errors at debug level only
+- [x] Return (None, None, None) for all error cases
 
 **Acceptance Criteria**:
 - Network disconnected → silent failure, no error shown
@@ -88,10 +88,10 @@ Implementation tasks for Feature #6: Automated Update Checking. This change adds
 - Health checks continue normally on API failure
 
 ### Task 2.4: Handle rate limiting
-- [ ] Detect HTTP 403 with rate limit headers
-- [ ] Log warning about rate limiting at debug level
-- [ ] Document rate limits in README (60 req/hour unauthenticated)
-- [ ] Suggest disabling checks if rate limited frequently
+- [x] Detect HTTP 403 with rate limit headers
+- [x] Log warning about rate limiting at debug level
+- [x] Document rate limits in README (60 req/hour unauthenticated)
+- [x] Suggest disabling checks if rate limited frequently
 
 **Acceptance Criteria**:
 - Rate limit errors logged but not shown to user
@@ -99,11 +99,11 @@ Implementation tasks for Feature #6: Automated Update Checking. This change adds
 - DISABLE_VERSION_CHECK mentioned as workaround
 
 ### Task 2.5: Test with real GitHub API
-- [ ] Manual test: fetch latest release
-- [ ] Verify response parsing
-- [ ] Test with network disconnected (simulate failure)
-- [ ] Test with invalid repository (simulate 404)
-- [ ] Verify timeout works correctly
+- [x] Manual test: fetch latest release
+- [x] Verify response parsing
+- [x] Test with network disconnected (simulate failure)
+- [x] Test with invalid repository (simulate 404)
+- [x] Verify timeout works correctly
 
 **Acceptance Criteria**:
 - Successfully fetches v1.0.0 (or latest)
@@ -112,14 +112,14 @@ Implementation tasks for Feature #6: Automated Update Checking. This change adds
 
 ---
 
-## Phase 3: Report Integration 📋
+## Phase 3: Report Integration ✅
 
 ### Task 3.1: Create `check_version_update()` function
-- [ ] Call check_github_releases() to get latest version
-- [ ] Compare with current __version__ using version comparison logic
-- [ ] Return empty list if no update available
-- [ ] Return empty list if check failed (silent failure)
-- [ ] Return issue dict if newer version found
+- [x] Call check_github_releases() to get latest version
+- [x] Compare with current __version__ using version comparison logic
+- [x] Return empty list if no update available
+- [x] Return empty list if check failed (silent failure)
+- [x] Return issue dict if newer version found
 
 **Acceptance Criteria**:
 - Returns [] when up to date
@@ -127,13 +127,13 @@ Implementation tasks for Feature #6: Automated Update Checking. This change adds
 - Returns [issue] when update available
 
 ### Task 3.2: Format INFO-level issue notification
-- [ ] Set severity to "INFO"
-- [ ] Description: "New version available: X.Y.Z (current: A.B.C)"
-- [ ] Context includes:
+- [x] Set severity to "INFO"
+- [x] Description: "New version available: X.Y.Z (current: A.B.C)"
+- [x] Context includes:
   - Brief explanation
   - wget command to download new version
   - Link to changelog/release notes
-- [ ] Follow existing issue format conventions
+- [x] Follow existing issue format conventions
 
 **Acceptance Criteria**:
 ```python
@@ -147,10 +147,10 @@ Implementation tasks for Feature #6: Automated Update Checking. This change adds
 ```
 
 ### Task 3.3: Add to check execution flow
-- [ ] Find appropriate location in main execution (after initialization)
-- [ ] Call check_version_update() and extend issues list
-- [ ] Add logging: "Checking for script updates..." (INFO level)
-- [ ] Ensure it runs before other checks (shows at top of report)
+- [x] Find appropriate location in main execution (after initialization)
+- [x] Call check_version_update() and extend issues list
+- [x] Add logging: "Checking for script updates..." (INFO level)
+- [x] Ensure it runs before other checks (shows at top of report)
 
 **Location**: Around line 900-1000 in linux_health_check.py
 
@@ -160,10 +160,10 @@ Implementation tasks for Feature #6: Automated Update Checking. This change adds
 - Does not delay other checks significantly
 
 ### Task 3.4: Test in Markdown export format
-- [ ] Run script with newer version mocked
-- [ ] Verify INFO issue appears in Markdown report
-- [ ] Verify formatting is correct
-- [ ] Verify links are clickable
+- [x] Run script with newer version mocked
+- [x] Verify INFO issue appears in Markdown report
+- [x] Verify formatting is correct
+- [x] Verify links are clickable
 
 **Acceptance Criteria**:
 - Shows as INFO-level issue in Markdown
@@ -171,10 +171,10 @@ Implementation tasks for Feature #6: Automated Update Checking. This change adds
 - Links formatted correctly
 
 ### Task 3.5: Test in JSON export format
-- [ ] Run with EXPORT_FORMAT=json
-- [ ] Verify issue appears in JSON output
-- [ ] Verify JSON structure matches other issues
-- [ ] Verify all fields present (severity, description, context)
+- [x] Run with EXPORT_FORMAT=json
+- [x] Verify issue appears in JSON output
+- [x] Verify JSON structure matches other issues
+- [x] Verify all fields present (severity, description, context)
 
 **Acceptance Criteria**:
 - Valid JSON output
@@ -182,10 +182,10 @@ Implementation tasks for Feature #6: Automated Update Checking. This change adds
 - Can be parsed by external tools
 
 ### Task 3.6: Test in XML export format
-- [ ] Run with EXPORT_FORMAT=xml
-- [ ] Verify issue appears in XML output
-- [ ] Verify XML is valid and well-formed
-- [ ] Verify special characters are escaped properly
+- [x] Run with EXPORT_FORMAT=xml
+- [x] Verify issue appears in XML output
+- [x] Verify XML is valid and well-formed
+- [x] Verify special characters are escaped properly
 
 **Acceptance Criteria**:
 - Valid XML output
@@ -193,10 +193,10 @@ Implementation tasks for Feature #6: Automated Update Checking. This change adds
 - URLs don't break XML structure
 
 ### Task 3.7: Test in text export format
-- [ ] Run with EXPORT_FORMAT=text
-- [ ] Verify issue appears in plain text report
-- [ ] Verify formatting is readable
-- [ ] Verify line wrapping is appropriate
+- [x] Run with EXPORT_FORMAT=text
+- [x] Verify issue appears in plain text report
+- [x] Verify formatting is readable
+- [x] Verify line wrapping is appropriate
 
 **Acceptance Criteria**:
 - Readable plain text output
@@ -205,13 +205,13 @@ Implementation tasks for Feature #6: Automated Update Checking. This change adds
 
 ---
 
-## Phase 4: Configuration & Safety ⚙️
+## Phase 4: Configuration & Safety ✅
 
 ### Task 4.1: Add DISABLE_VERSION_CHECK environment variable
-- [ ] Check for DISABLE_VERSION_CHECK=1 in check_github_releases()
-- [ ] Return (None, None, None) immediately if set
-- [ ] Document in README usage section
-- [ ] Add to help text or configuration section
+- [x] Check for DISABLE_VERSION_CHECK=1 in check_github_releases()
+- [x] Return (None, None, None) immediately if set
+- [x] Document in README usage section
+- [x] Add to help text or configuration section
 
 **Acceptance Criteria**:
 - DISABLE_VERSION_CHECK=1 → no API call made
@@ -219,10 +219,10 @@ Implementation tasks for Feature #6: Automated Update Checking. This change adds
 - Documented in README
 
 ### Task 4.2: Add configuration constants
-- [ ] Add VERSION_CHECK_TIMEOUT constant (default: 3)
-- [ ] Add GITHUB_REPO constant ('0xgruber/linux-health-checks')
-- [ ] Add constants near top of file with other configuration
-- [ ] Document constants in comments
+- [x] Add VERSION_CHECK_TIMEOUT constant (default: 3)
+- [x] Add GITHUB_REPO constant ('0xgruber/linux-health-checks')
+- [x] Add constants near top of file with other configuration
+- [x] Document constants in comments
 
 **Acceptance Criteria**:
 ```python
@@ -232,10 +232,10 @@ GITHUB_REPO = '0xgruber/linux-health-checks'
 ```
 
 ### Task 4.3: Add debug logging for version checks
-- [ ] Log "Checking for script updates..." at INFO level (user-visible)
-- [ ] Log "Version check result: up-to-date/update-available/failed" at DEBUG level
-- [ ] Log API errors at DEBUG level with exception details
-- [ ] Log rate limiting at DEBUG level
+- [x] Log "Checking for script updates..." at INFO level (user-visible)
+- [x] Log "Version check result: up-to-date/update-available/failed" at DEBUG level
+- [x] Log API errors at DEBUG level with exception details
+- [x] Log rate limiting at DEBUG level
 
 **Acceptance Criteria**:
 - Normal execution: only INFO message shown
@@ -243,10 +243,10 @@ GITHUB_REPO = '0xgruber/linux-health-checks'
 - No sensitive information logged
 
 ### Task 4.4: Ensure silent failure on all errors
-- [ ] Review all error paths in check_github_releases()
-- [ ] Verify no exceptions propagate to caller
-- [ ] Verify health checks continue on version check failure
-- [ ] Test with various error conditions
+- [x] Review all error paths in check_github_releases()
+- [x] Verify no exceptions propagate to caller
+- [x] Verify health checks continue on version check failure
+- [x] Test with various error conditions
 
 **Acceptance Criteria**:
 - Network failure → silent, checks continue
@@ -255,12 +255,12 @@ GITHUB_REPO = '0xgruber/linux-health-checks'
 - Invalid JSON → silent, checks continue
 
 ### Task 4.5: Update README.md with version check documentation
-- [ ] Add "Automated Update Checking" section
-- [ ] Explain what version checking does
-- [ ] Document DISABLE_VERSION_CHECK environment variable
-- [ ] Document VERSION_CHECK_TIMEOUT configuration
-- [ ] Mention rate limits (60 requests/hour)
-- [ ] Note: no auto-update, manual upgrade required
+- [x] Add "Automated Update Checking" section
+- [x] Explain what version checking does
+- [x] Document DISABLE_VERSION_CHECK environment variable
+- [x] Document VERSION_CHECK_TIMEOUT configuration
+- [x] Mention rate limits (60 requests/hour)
+- [x] Note: no auto-update, manual upgrade required
 
 **Acceptance Criteria**:
 - Clear explanation of feature
@@ -268,10 +268,10 @@ GITHUB_REPO = '0xgruber/linux-health-checks'
 - Examples provided
 
 ### Task 4.6: Update CHANGELOG.md
-- [ ] Add entry for version 1.1.0
-- [ ] Document new feature: "Automated update checking"
-- [ ] List new environment variables
-- [ ] Follow Keep a Changelog format
+- [x] Add entry for version 1.1.0
+- [x] Document new feature: "Automated update checking"
+- [x] List new environment variables
+- [x] Follow Keep a Changelog format
 
 **Acceptance Criteria**:
 ```markdown
@@ -293,10 +293,10 @@ GITHUB_REPO = '0xgruber/linux-health-checks'
 ## Phase 5: Testing & Validation ✅
 
 ### Task 5.1: Run OpenSpec validation
-- [ ] Run: `openspec validate add-version-check-notification --strict`
-- [ ] Fix any validation errors
-- [ ] Ensure proposal, tasks, design all valid
-- [ ] Ensure no conflicting changes
+- [x] Run: `openspec validate add-version-check-notification --strict`
+- [x] Fix any validation errors
+- [x] Ensure proposal, tasks, design all valid
+- [x] Ensure no conflicting changes
 
 **Acceptance Criteria**:
 - `openspec validate` passes with no errors
@@ -304,12 +304,12 @@ GITHUB_REPO = '0xgruber/linux-health-checks'
 - Proposal approved (if approval mechanism exists)
 
 ### Task 5.2: Manual test - newer version available
-- [ ] Temporarily change __version__ to "0.9.0"
-- [ ] Run script: `sudo ./linux_health_check.py`
-- [ ] Verify INFO notification appears
-- [ ] Verify upgrade instructions shown
-- [ ] Verify URLs are correct
-- [ ] Revert __version__ change
+- [x] Temporarily change __version__ to "0.9.0"
+- [x] Run script: `sudo ./linux_health_check.py`
+- [x] Verify INFO notification appears
+- [x] Verify upgrade instructions shown
+- [x] Verify URLs are correct
+- [x] Revert __version__ change
 
 **Acceptance Criteria**:
 - INFO issue shows: "New version available: 1.0.0 (current: 0.9.0)"
@@ -317,20 +317,20 @@ GITHUB_REPO = '0xgruber/linux-health-checks'
 - Changelog link shows correct release URL
 
 ### Task 5.3: Manual test - up to date
-- [ ] Run script with current version: `sudo ./linux_health_check.py`
-- [ ] Verify NO version notification appears
-- [ ] Verify all other checks run normally
+- [x] Run script with current version: `sudo ./linux_health_check.py`
+- [x] Verify NO version notification appears
+- [x] Verify all other checks run normally
 
 **Acceptance Criteria**:
 - No version notification in report
 - Script runs normally
 
 ### Task 5.4: Manual test - network disconnected
-- [ ] Disconnect network or block github.com
-- [ ] Run script: `sudo ./linux_health_check.py`
-- [ ] Verify no error messages shown
-- [ ] Verify health checks complete successfully
-- [ ] Check debug logs (if enabled) show network error
+- [x] Disconnect network or block github.com
+- [x] Run script: `sudo ./linux_health_check.py`
+- [x] Verify no error messages shown
+- [x] Verify health checks complete successfully
+- [x] Check debug logs (if enabled) show network error
 
 **Acceptance Criteria**:
 - No error messages to user
@@ -338,10 +338,10 @@ GITHUB_REPO = '0xgruber/linux-health-checks'
 - Health checks run normally
 
 ### Task 5.5: Manual test - DISABLE_VERSION_CHECK=1
-- [ ] Run: `DISABLE_VERSION_CHECK=1 sudo ./linux_health_check.py`
-- [ ] Verify no API call made (check logs or network traffic)
-- [ ] Verify no version notification
-- [ ] Verify script runs normally
+- [x] Run: `DISABLE_VERSION_CHECK=1 sudo ./linux_health_check.py`
+- [x] Verify no API call made (check logs or network traffic)
+- [x] Verify no version notification
+- [x] Verify script runs normally
 
 **Acceptance Criteria**:
 - No GitHub API call made
@@ -349,11 +349,11 @@ GITHUB_REPO = '0xgruber/linux-health-checks'
 - Script runs faster (no network delay)
 
 ### Task 5.6: Test all export formats
-- [ ] Test Markdown (default)
-- [ ] Test JSON: `EXPORT_FORMAT=json sudo ./linux_health_check.py`
-- [ ] Test XML: `EXPORT_FORMAT=xml sudo ./linux_health_check.py`
-- [ ] Test text: `EXPORT_FORMAT=text sudo ./linux_health_check.py`
-- [ ] Verify version notification appears in all formats
+- [x] Test Markdown (default)
+- [x] Test JSON: `EXPORT_FORMAT=json sudo ./linux_health_check.py`
+- [x] Test XML: `EXPORT_FORMAT=xml sudo ./linux_health_check.py`
+- [x] Test text: `EXPORT_FORMAT=text sudo ./linux_health_check.py`
+- [x] Verify version notification appears in all formats
 
 **Acceptance Criteria**:
 - Version notification in Markdown report
@@ -362,14 +362,14 @@ GITHUB_REPO = '0xgruber/linux-health-checks'
 - Version notification in text output
 
 ### Task 5.7: Test on multiple distributions
-- [ ] Test on Debian 12
-- [ ] Test on Debian 13
-- [ ] Test on Ubuntu 22.04
-- [ ] Test on Ubuntu 24.04
-- [ ] Test on Rocky Linux 9
-- [ ] Test on Rocky Linux 10
-- [ ] Test on openSUSE Leap
-- [ ] Test on openSUSE Tumbleweed
+- [x] Test on Debian 12
+- [x] Test on Debian 13
+- [x] Test on Ubuntu 22.04
+- [x] Test on Ubuntu 24.04
+- [x] Test on Rocky Linux 9
+- [x] Test on Rocky Linux 10
+- [x] Test on openSUSE Leap
+- [x] Test on openSUSE Tumbleweed
 
 **Acceptance Criteria**:
 - Works on all 8 supported distributions
@@ -377,10 +377,10 @@ GITHUB_REPO = '0xgruber/linux-health-checks'
 - urllib.request available on all platforms
 
 ### Task 5.8: Performance test
-- [ ] Measure script execution time without version check
-- [ ] Measure script execution time with version check
-- [ ] Verify version check adds < 5 seconds to execution time
-- [ ] Test with slow network (should timeout at 3 seconds)
+- [x] Measure script execution time without version check
+- [x] Measure script execution time with version check
+- [x] Verify version check adds < 5 seconds to execution time
+- [x] Test with slow network (should timeout at 3 seconds)
 
 **Acceptance Criteria**:
 - Version check adds minimal overhead (< 5 seconds)
@@ -392,11 +392,11 @@ GITHUB_REPO = '0xgruber/linux-health-checks'
 ## Phase 6: Pull Request & Release 🚀
 
 ### Task 6.1: Review code for quality
-- [ ] Run pylint or flake8 (if used)
-- [ ] Check for PEP 8 compliance
-- [ ] Review error handling
-- [ ] Review logging statements
-- [ ] Review code comments and docstrings
+- [x] Run pylint or flake8 (if used)
+- [x] Check for PEP 8 compliance
+- [x] Review error handling
+- [x] Review logging statements
+- [x] Review code comments and docstrings
 
 **Acceptance Criteria**:
 - Code follows project style guidelines
@@ -404,19 +404,19 @@ GITHUB_REPO = '0xgruber/linux-health-checks'
 - Well-commented and documented
 
 ### Task 6.2: Update IMPROVEMENTS.md
-- [ ] Mark Feature #6 as "✅ Implemented in v1.1.0"
-- [ ] Update feature status from "Planned" to "Completed"
-- [ ] Add implementation date
+- [x] Mark Feature #6 as "✅ Implemented in v1.1.0"
+- [x] Update feature status from "Planned" to "Completed"
+- [x] Add implementation date
 
 **Acceptance Criteria**:
 - Feature #6 marked as completed
 - Version 1.1.0 referenced
 
 ### Task 6.3: Commit all changes
-- [ ] Stage all modified files
-- [ ] Create commit with message: "feat: add automated version checking (1.1.0)"
-- [ ] Include detailed commit body with summary
-- [ ] Push to feature branch
+- [x] Stage all modified files
+- [x] Create commit with message: "feat: add automated version checking (1.1.0)"
+- [x] Include detailed commit body with summary
+- [x] Push to feature branch
 
 **Commit Message**:
 ```
@@ -451,14 +451,14 @@ OpenSpec: openspec/changes/add-version-check-notification/
 ```
 
 ### Task 6.4: Create pull request
-- [ ] Push feature branch to GitHub
-- [ ] Create PR: feature/version-check-notification → main
-- [ ] Write PR description with:
+- [x] Push feature branch to GitHub
+- [x] Create PR: feature/version-check-notification → main
+- [x] Write PR description with:
   - Summary of changes
   - Link to OpenSpec proposal
   - Testing performed
   - Screenshots/examples
-- [ ] Request review from maintainer
+- [x] Request review from maintainer
 
 **PR Title**: "feat: Add automated version checking (1.1.0)"
 
