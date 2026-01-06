@@ -98,7 +98,6 @@ With `DISABLE_VERSION_CHECK=1`:
 - Python installation: `dnf install python3 ca-certificates`  
 - Rocky Linux 9 and 9.5 both passed all tests
 - Python 3.9.18 is the default version
-- Note: Rocky Linux 10 not yet released (used 9.5 instead)
 
 #### openSUSE Family
 - Python installation: `zypper install python3 ca-certificates`
