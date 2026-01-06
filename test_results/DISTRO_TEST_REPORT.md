@@ -1,13 +1,13 @@
 # Distribution Compatibility Test Report
 
-**Test Date:** 2026-01-05 22:06:27 CST  
+**Test Date:** 2026-01-05 22:13:00 CST  
 **Script:** linux_health_check.py  
 **Test Results:** test_results/
 
 ## Summary
 
-✅ **Passed:** 7 / 7 distributions  
-❌ **Failed:** 0 / 7 distributions
+✅ **Passed:** 8 / 8 distributions  
+❌ **Failed:** 0 / 8 distributions
 
 ## Test Results
 
@@ -18,6 +18,7 @@
 | Ubuntu 22.04 LTS | ✅ PASSED | 1/3/3/9/13 |
 | Ubuntu 24.04 LTS | ✅ PASSED | 0/3/3/10/13 |
 | Rocky Linux 9 | ✅ PASSED | 1/3/4/10/12 |
+| Rocky Linux 10 | ✅ PASSED | 1/2/3/10/14 |
 | openSUSE Leap 15 | ✅ PASSED | 0/4/3/16/3 |
 | openSUSE Tumbleweed | ✅ PASSED | 0/3/4/11/11 |
 
@@ -44,7 +45,7 @@
 
 - **Debian:** 12 (Bookworm), 13 (Trixie)
 - **Ubuntu:** 22.04 LTS (Jammy), 24.04 LTS (Noble)
-- **Rocky Linux:** 9
+- **Rocky Linux:** 9, 10
 - **openSUSE:** Leap 15, Tumbleweed
 
 ### Experimental ⚠️

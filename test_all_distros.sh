@@ -36,6 +36,7 @@ declare -a DISTROS=(
     "ubuntu:22.04"
     "ubuntu:24.04"
     "rockylinux:9"
+    "rockylinux/rockylinux:10"
     "opensuse/leap:15"
     "opensuse/tumbleweed:latest"
 )
@@ -46,6 +47,7 @@ declare -A DISTRO_NAMES=(
     ["ubuntu:22.04"]="Ubuntu 22.04 LTS"
     ["ubuntu:24.04"]="Ubuntu 24.04 LTS"
     ["rockylinux:9"]="Rocky Linux 9"
+    ["rockylinux/rockylinux:10"]="Rocky Linux 10"
     ["opensuse/leap:15"]="openSUSE Leap 15"
     ["opensuse/tumbleweed:latest"]="openSUSE Tumbleweed"
 )

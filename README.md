@@ -5,9 +5,9 @@
 [![Python](https://img.shields.io/badge/python-3.8%2B-blue.svg)](https://www.python.org/)
 [![Debian](https://img.shields.io/badge/Debian-12%20%7C%2013-red.svg)](https://www.debian.org/)
 [![Ubuntu](https://img.shields.io/badge/Ubuntu-22.04%20%7C%2024.04-orange.svg)](https://ubuntu.com/)
-[![Rocky](https://img.shields.io/badge/Rocky-9-green.svg)](https://rockylinux.org/)
+[![Rocky](https://img.shields.io/badge/Rocky-9%20%7C%2010-green.svg)](https://rockylinux.org/)
 [![openSUSE](https://img.shields.io/badge/openSUSE-Leap%20%7C%20Tumbleweed-brightgreen.svg)](https://www.opensuse.org/)
-[![Tests](https://img.shields.io/badge/tests-7%2F7%20passing-success.svg)](test_results/DISTRO_TEST_REPORT.md)
+[![Tests](https://img.shields.io/badge/tests-8%2F8%20passing-success.svg)](test_results/DISTRO_TEST_REPORT.md)
 
 Comprehensive cross-distribution health and security audit script for Linux servers. The script performs 35+ distinct checks across security, system health, storage, packages, networking, and iSCSI, ranks findings by severity (Critical/High/Medium/Low/Info), and produces exportable reports with optional GPG encryption and email delivery.
 
@@ -23,7 +23,7 @@ Comprehensive cross-distribution health and security audit script for Linux serv
 **Officially Supported ✅** (Tested in Docker containers):
 - **Debian:** 12 (Bookworm), 13 (Trixie)
 - **Ubuntu:** 22.04 LTS (Jammy), 24.04 LTS (Noble)
-- **Rocky Linux:** 9
+- **Rocky Linux:** 9, 10
 - **openSUSE:** Leap 15, Tumbleweed
 
 **Experimental ⚠️** (Not officially tested):
