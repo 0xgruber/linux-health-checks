@@ -107,16 +107,16 @@ except Exception as e:
         echo -e "    ${YELLOW}⚠${NC} Version check log not found (script may have exited early due to missing tools)"
     fi
     
-    # Test 6: Version check disabled
-    echo "  [6] Testing DISABLE_VERSION_CHECK=1..."
+    # Test 6: Remote update check disabled (logging only)
+    echo "  [6] Testing DISABLE_VERSION_CHECK=1 (no remote update)..."
     OUTPUT=$(docker run --rm -e DISABLE_VERSION_CHECK=1 -v "$SCRIPT:/script.py:ro" "$docker_image" sh -c "$install_cmd >/dev/null 2>&1 && timeout 10 python3 /script.py 2>&1 || true")
     HAS_CHECK_LOG=$(echo "$OUTPUT" | grep -c "Checking for script updates" || echo 0)
     HAS_UPDATE_MSG=$(echo "$OUTPUT" | grep -c "New version available" || echo 0)
     
     if [[ $HAS_CHECK_LOG -gt 0 ]] && [[ $HAS_UPDATE_MSG -eq 0 ]]; then
-        echo -e "    ${GREEN}✓${NC} Version check properly disabled (log present, no API call)"
+        echo -e "    ${GREEN}✓${NC} DISABLE_VERSION_CHECK active: logging only (no remote update message)"
     elif [[ $HAS_CHECK_LOG -eq 0 ]]; then
-        echo -e "    ${YELLOW}⚠${NC} Log message not found (script exited early)"
+        echo -e "    ${YELLOW}⚠${NC} No version check log detected (script may have exited early)"
     else
         echo -e "    ${YELLOW}⚠${NC} Unexpected behavior"
     fi
