@@ -72,7 +72,7 @@ With `DISABLE_VERSION_CHECK=1`:
 
 ## Test Details
 
-###Tests Performed
+### Tests Performed
 
 1. **Python Installation**: Install Python 3.x via distro package manager
 2. **Syntax Check**: Run `python3 -m py_compile linux_health_check.py`
