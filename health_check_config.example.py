@@ -25,9 +25,12 @@ restrict file permissions: chmod 600 health_check_config.py
 # Default: "/root" if running as root, otherwise "/tmp"
 # OUTPUT_DIR = "/var/log/health-checks"
 
-# Output filename (will be combined with OUTPUT_DIR)
-# Default: "health_report.txt"
-# OUTPUT_FILE = None  # Set to None to use default location
+# Output filename (would be combined with OUTPUT_DIR)
+# NOTE: The current version of linux_health_check.py always writes to
+#       "health_report.txt" in OUTPUT_DIR and ignores any OUTPUT_FILE value.
+#       This setting is kept here for documentation/backward compatibility
+#       only and is not currently used by the script.
+# OUTPUT_FILE = None  # DEPRECATED: not read by linux_health_check.py
 
 # ============================================================================
 # EMAIL CONFIGURATION
