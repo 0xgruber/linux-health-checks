@@ -138,11 +138,11 @@ test_distro() {
     echo -n "  [6/8] Testing version check notification... "
     docker run --rm -v "$SCRIPT_PATH:/script.py:ro" "$docker_image" sh -c "
         $install_cmd >/dev/null 2>&1
-        sed 's/__version__ = \"1.1.0\"/__version__ = \"0.9.0\"/' /script.py > /tmp/old_version.py
+        sed 's/__version__ = \"1.2.0\"/__version__ = \"0.9.0\"/' /script.py > /tmp/old_version.py
         timeout 15 python3 /tmp/old_version.py 2>&1
     " > /tmp/version_test_$$ 2>&1 || true
     
-    if grep -q "New version available: 1.1.0 (current: 0.9.0)" /tmp/version_test_$$; then
+    if grep -q "New version available: 1.2.0 (current: 0.9.0)" /tmp/version_test_$$; then
         echo -e "${GREEN}✓ PASSED${NC}"
         ((PASSED_TESTS++))
     else
