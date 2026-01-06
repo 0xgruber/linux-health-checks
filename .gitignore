@@ -48,6 +48,13 @@ health_report*.gpg
 /tmp/
 test_reports/
 
+# Test results (keep the summary report)
+test_results/*.log
+test_results/*.json
+test_results/*.build
+test_results/Dockerfile.*
+test_results/*.status
+
 # Sensitive configuration (if created)
 .env
 config.local.py

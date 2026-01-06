@@ -1,5 +1,14 @@
 # Linux Health Checks
 
+[![Version](https://img.shields.io/badge/version-2026.01.05-blue.svg)](https://github.com/0xgruber/linux-health-checks/releases)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![Python](https://img.shields.io/badge/python-3.8%2B-blue.svg)](https://www.python.org/)
+[![Debian](https://img.shields.io/badge/Debian-12%20%7C%2013-red.svg)](https://www.debian.org/)
+[![Ubuntu](https://img.shields.io/badge/Ubuntu-22.04%20%7C%2024.04-orange.svg)](https://ubuntu.com/)
+[![Rocky](https://img.shields.io/badge/Rocky-9-green.svg)](https://rockylinux.org/)
+[![openSUSE](https://img.shields.io/badge/openSUSE-Leap%20%7C%20Tumbleweed-brightgreen.svg)](https://www.opensuse.org/)
+[![Tests](https://img.shields.io/badge/tests-7%2F7%20passing-success.svg)](test_results/DISTRO_TEST_REPORT.md)
+
 Comprehensive cross-distribution health and security audit script for Linux servers. The script performs 35+ distinct checks across security, system health, storage, packages, networking, and iSCSI, ranks findings by severity (Critical/High/Medium/Low/Info), and produces exportable reports with optional GPG encryption and email delivery.
 
 **Author:** Aaron Gruber <aaron@gizmobear.io>  
@@ -10,12 +19,23 @@ Comprehensive cross-distribution health and security audit script for Linux serv
 ## Key Features
 
 ### Cross-Distribution Support
-Automatically detects and adapts to:
-- **RHEL/Rocky/CentOS** - Uses `dnf`/`yum`, firewalld, SELinux
-- **Debian/Ubuntu** - Uses `apt`, ufw/iptables, AppArmor  
-- **SUSE** - Uses `zypper`
-- **Arch** - Uses `pacman`
-- Auto-detection of package managers, firewalls (firewalld/ufw/iptables), security frameworks (SELinux/AppArmor), and distribution-specific log paths
+
+**Officially Supported ✅** (Tested in Docker containers):
+- **Debian:** 12 (Bookworm), 13 (Trixie)
+- **Ubuntu:** 22.04 LTS (Jammy), 24.04 LTS (Noble)
+- **Rocky Linux:** 9
+- **openSUSE:** Leap 15, Tumbleweed
+
+**Experimental ⚠️** (Not officially tested):
+- **Arch Linux:** May work but use at your own risk. Not tested or officially supported.
+
+**Auto-detection features:**
+- Package managers: `dnf`/`yum`, `apt`, `zypper`, `pacman`
+- Firewalls: firewalld, ufw, iptables
+- Security frameworks: SELinux, AppArmor
+- Distribution-specific log paths and configurations
+
+> See [test_results/DISTRO_TEST_REPORT.md](test_results/DISTRO_TEST_REPORT.md) for detailed test results across all supported distributions.
 
 ### Security Auditing (8 checks)
 - SELinux/AppArmor enforcement status
