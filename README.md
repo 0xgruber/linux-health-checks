@@ -19,7 +19,11 @@ Automatically detects and adapts to:
 
 ### Security Auditing (8 checks)
 - SELinux/AppArmor enforcement status
-- SSH service state (should be disabled/inactive per policy)
+- SSH authentication analysis:
+  - **HIGH severity**: Password authentication enabled
+  - **MEDIUM severity**: RSA/DSA keys in use (weak algorithms)
+  - **LOW severity**: ed25519 or ECDSA keys (strong key-based auth)
+  - **INFO**: SSH service disabled (good)
 - SSH root login configuration (PermitRootLogin)
 - Wheel group membership (should be empty per policy)
 - Login shell users (only `locadmin` allowed per policy)
@@ -193,7 +197,12 @@ GPG_KEYRING = None                        # Optional keyring path
 
 Hard-coded policy expectations (modify in source if your standards differ):
 
-- **SSH**: Service should be disabled and inactive; root login forbidden
+- **SSH**: 
+  - INFO if disabled (good)
+  - HIGH if password authentication enabled
+  - MEDIUM if using RSA/DSA keys
+  - LOW if using ed25519/ECDSA keys (acceptable)
+  - Root login should be forbidden
 - **Users**: Only `locadmin` should have login shell (UID ≥ 1000, excluding 65534)
 - **Wheel group**: Should be empty
 - **Sudoers**: `locadmin` limited to NOEXEC for `/usr/sbin/reboot` and `/usr/sbin/shutdown`

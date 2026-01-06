@@ -220,30 +220,146 @@ def detect_os():
 
 
 def check_ssh_status():
-    """Check if SSH is enabled and running."""
-    logger.info("Checking SSH status...")
+    """Check SSH service status and authentication configuration."""
+    logger.info("Checking SSH status and authentication methods...")
 
-    rc, stdout, _ = run_command(["systemctl", "is-enabled", "sshd"])
-    if rc == 0 and "enabled" in stdout.lower():
+    # Check if SSH is running
+    rc, stdout, _ = run_command(["systemctl", "is-active", "sshd"])
+    if rc != 0 or "active" not in stdout.lower():
         add_issue(
-            "HIGH",
-            "Security",
-            "SSH service is enabled",
-            "SSH should be disabled on systems that don't require remote access",
+            "INFO", "Security", "SSH service is not running", "Good: SSH is disabled"
         )
         return
 
-    rc, stdout, _ = run_command(["systemctl", "is-active", "sshd"])
-    if rc == 0 and "active" in stdout.lower():
+    # SSH is running - now check authentication configuration
+    sshd_config = "/etc/ssh/sshd_config"
+    if not os.path.exists(sshd_config):
         add_issue(
-            "HIGH",
+            "MEDIUM",
             "Security",
-            "SSH service is running",
-            "SSH is active but may not be needed",
+            "SSH is running but sshd_config not found",
+            "Cannot verify SSH authentication settings",
         )
-    else:
+        return
+
+    try:
+        with open(sshd_config, "r") as f:
+            config_content = f.read()
+
+        # Check password authentication
+        password_auth_enabled = True
+        password_lines = grep_output(config_content, r"^\s*PasswordAuthentication")
+        for line in reversed(password_lines):
+            if not line.strip().startswith("#"):
+                if "no" in line.lower():
+                    password_auth_enabled = False
+                break
+
+        # Check pubkey authentication
+        pubkey_auth_enabled = True  # Default is yes
+        pubkey_lines = grep_output(config_content, r"^\s*PubkeyAuthentication")
+        for line in reversed(pubkey_lines):
+            if not line.strip().startswith("#"):
+                if "no" in line.lower():
+                    pubkey_auth_enabled = False
+                break
+
+        # If password auth is enabled (and pubkey might be disabled)
+        if password_auth_enabled:
+            add_issue(
+                "HIGH",
+                "Security",
+                "SSH is running with password authentication enabled",
+                "Password authentication should be disabled. Use key-based authentication with ed25519 or better",
+            )
+            return
+
+        # Password auth disabled, check key types
+        if pubkey_auth_enabled:
+            # Check for allowed key types and host keys
+            weak_keys_found = []
+            strong_keys_found = []
+
+            # Check HostKey directives for key types in use
+            hostkey_lines = grep_output(config_content, r"^\s*HostKey\s+")
+            for line in hostkey_lines:
+                if not line.strip().startswith("#"):
+                    if "rsa" in line.lower() or "dsa" in line.lower():
+                        weak_keys_found.append(line.strip())
+                    elif "ed25519" in line.lower() or "ecdsa" in line.lower():
+                        strong_keys_found.append(line.strip())
+
+            # Check PubkeyAcceptedKeyTypes or PubkeyAcceptedAlgorithms (newer OpenSSH)
+            accepted_key_lines = grep_output(
+                config_content, r"^\s*PubkeyAccepted(KeyTypes|Algorithms)"
+            )
+            weak_algo_allowed = False
+            for line in accepted_key_lines:
+                if not line.strip().startswith("#"):
+                    if "rsa" in line.lower() or "dsa" in line.lower():
+                        weak_algo_allowed = True
+
+            # Check authorized_keys for actual key types (check common locations)
+            auth_keys_paths = [
+                "/root/.ssh/authorized_keys",
+                "/home/*/.ssh/authorized_keys",
+            ]
+
+            rsa_keys_in_use = False
+            ed25519_keys_in_use = False
+
+            for pattern in auth_keys_paths:
+                import glob
+
+                for auth_file in glob.glob(pattern):
+                    try:
+                        with open(auth_file, "r") as f:
+                            auth_content = f.read()
+                            if "ssh-rsa" in auth_content or "ssh-dss" in auth_content:
+                                rsa_keys_in_use = True
+                            if "ssh-ed25519" in auth_content:
+                                ed25519_keys_in_use = True
+                    except (PermissionError, IOError):
+                        pass
+
+            # Determine severity based on findings
+            if rsa_keys_in_use or weak_keys_found or weak_algo_allowed:
+                add_issue(
+                    "MEDIUM",
+                    "Security",
+                    "SSH is using weak key algorithms (RSA or older)",
+                    f"SSH accepts RSA/DSA keys. Upgrade to ed25519 keys. Weak keys: {', '.join(weak_keys_found) if weak_keys_found else 'RSA keys in authorized_keys'}",
+                )
+            elif ed25519_keys_in_use or strong_keys_found:
+                add_issue(
+                    "LOW",
+                    "Security",
+                    "SSH is running with strong key-based authentication",
+                    "SSH uses ed25519 or ECDSA keys - acceptable configuration",
+                )
+            else:
+                # Can't determine key types
+                add_issue(
+                    "LOW",
+                    "Security",
+                    "SSH is running with pubkey authentication",
+                    "Password auth disabled, but cannot verify key types. Ensure ed25519 keys are used.",
+                )
+        else:
+            # Pubkey disabled and password disabled = problematic
+            add_issue(
+                "HIGH",
+                "Security",
+                "SSH is running but all authentication methods disabled",
+                "Both password and pubkey authentication are disabled",
+            )
+
+    except PermissionError:
         add_issue(
-            "INFO", "Security", "SSH service is not running", "Good: SSH is disabled"
+            "MEDIUM",
+            "Security",
+            "SSH is running but cannot read sshd_config",
+            "Permission denied - run as root to verify SSH configuration",
         )
 
 
