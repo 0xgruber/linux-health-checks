@@ -153,9 +153,16 @@ wget https://github.com/0xgruber/linux-health-checks/releases/latest/download/li
 # Make executable
 chmod +x linux_health_check.py
 
+# Optional: Download and customize config file
+wget https://github.com/0xgruber/linux-health-checks/releases/latest/download/health_check.cfg.example
+cp health_check.cfg.example health_check.cfg
+nano health_check.cfg  # Customize output directory, email, thresholds, etc.
+
 # Run the script
 sudo ./linux_health_check.py
 ```
+
+> **Note:** Configuration file is optional. The script works with sensible defaults. Create `health_check.cfg` only if you need to customize output directory, email delivery, or system thresholds. See [Configuration](#configuration) section for details.
 
 ### From Source
 
@@ -167,8 +174,48 @@ cd linux-health-checks
 # Make executable
 chmod +x linux_health_check.py
 
+# Optional: Set up configuration file
+cp health_check.cfg.example health_check.cfg
+nano health_check.cfg  # Customize output directory, email, thresholds, etc.
+
 # Run the script
 sudo ./linux_health_check.py
+```
+
+> **Note:** Configuration file is optional. The script works with sensible defaults. Create `health_check.cfg` only if you need to customize output directory, email delivery, or system thresholds. See [Configuration](#configuration) section for details.
+
+
+### Usage Examples
+
+**Basic execution** (requires root for full coverage):
+```bash
+sudo ./linux_health_check.py
+```
+
+**As non-root** (limited visibility, writes to /tmp):
+```bash
+./linux_health_check.py
+```
+
+**Choose output format** (default: markdown):
+```bash
+# JSON format (machine-readable)
+EXPORT_FORMAT=json sudo ./linux_health_check.py
+
+# XML format (enterprise systems)
+EXPORT_FORMAT=xml sudo ./linux_health_check.py
+
+# Plain text format (simple parsing)
+EXPORT_FORMAT=text sudo ./linux_health_check.py
+```
+
+**Override configuration temporarily**:
+```bash
+# Override filesystem warning threshold for one-time check
+FILESYSTEM_WARNING=75 sudo ./linux_health_check.py
+
+# Override multiple values
+OUTPUT_DIR=/var/log/health FILESYSTEM_WARNING=70 sudo ./linux_health_check.py
 ```
 
 ### Versioning
@@ -318,96 +365,6 @@ Hard-coded policy expectations (modify in source if your standards differ):
 - **System load**: Warn >1.5×CPUs, critical >2×CPUs
 - **CPU temp**: Warn >70°C, critical >80°C
 - **Orphaned packages**: Only `veeamdeployment` and `veeamtransport` allowed
-
-## Installation & Usage
-
-### Installation
-```bash
-# Create directory structure
-mkdir -p ~/code/linux-health-checks
-cd ~/code/linux-health-checks
-
-# Copy script from Downloads (adjust path if different)
-cp ~/Downloads/linux_health_check.py .
-
-# Make executable
-chmod +x linux_health_check.py
-
-# Edit configuration constants at top of file
-nano linux_health_check.py  # or vim, vi, etc.
-```
-
-### Running the Script
-
-**Interactive run** (requires root for full coverage):
-```bash
-sudo ./linux_health_check.py
-```
-
-**As non-root** (limited visibility, writes to /tmp):
-```bash
-./linux_health_check.py
-```
-
-**Choose output format** (default: markdown):
-```bash
-# Markdown format (default)
-./linux_health_check.py
-
-# JSON format (machine-readable)
-EXPORT_FORMAT=json ./linux_health_check.py
-
-# XML format (enterprise systems)
-EXPORT_FORMAT=xml ./linux_health_check.py
-
-# Plain text format (simple parsing)
-EXPORT_FORMAT=text ./linux_health_check.py
-```
-
-### What Happens During Execution
-
-1. **OS Detection** - Identifies distribution, package manager, firewall, security framework
-2. **Security Checks** - Validates hardening configurations
-3. **System Health** - Monitors load, memory, processes, services
-4. **Storage** - Checks filesystem and inode usage
-5. **Package Updates** - Scans for security updates and orphans
-6. **Networking** - Tests firewall, ports, NTP, DNS, interface stats
-7. **iSCSI** - Verifies service, sessions, targets, logs
-8. **Issue Summary** - Displays table of findings by severity
-9. **Report Generation** - Creates structured report in chosen format (default: Markdown)
-10. **Email** - Optionally encrypts and sends report (if configured)
-
-### Example Output
-
-Console/log output shows:
-```
-## OS Detection
-Distribution: Rocky Linux 8.9 (Green Obsidian)
-Package Manager: dnf
-Security Framework: selinux
-Firewall: firewalld
-
-## SELinux Status
-Desired state: Enforcing
-Current state: Enforcing
-PASS: SELinux is enforcing.
-
-## SSH Service Status
-Desired state: Disabled, Inactive
-Enabled: disabled
-Active: inactive
-PASS: SSH is disabled and inactive.
-...
-```
-
-Issue summary table at end:
-```
-| Severity | Count |
-|----------|-------|
-| 🔴 **Critical** | 2 |
-| 🟠 **High** | 5 |
-| 🟡 **Medium** | 3 |
-```
 
 ## Output Artifacts
 
