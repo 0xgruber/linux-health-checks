@@ -26,7 +26,7 @@ Operations teams need automated, cross-distribution health and security auditing
 - **Affected code**: 
   - New file: `linux_health_check.py` (~2500 lines)
   - Documentation: `README.md`, `openspec/project.md`
-- **Dependencies**: Python 3.8+ stdlib only; optional GPG and SMTP relay
+- **Dependencies**: Python 3.6+ stdlib only; optional GPG and SMTP relay
 - **Breaking changes**: None (new capability)
 - **Migration path**: N/A (new system)
 

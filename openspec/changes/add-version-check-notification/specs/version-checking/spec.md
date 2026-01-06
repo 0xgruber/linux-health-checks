@@ -261,8 +261,8 @@ The system SHALL work on all 8 supported Linux distributions using only Python s
 - **WHEN** script imports version checking functions
 - **THEN** only Python standard library modules are used (urllib.request, urllib.error, json, os, logging)
 
-#### Scenario: Python 3.6.15 (tested) and 3.8+ (supported) compatibility
-- **WHEN** script runs on Python 3.6.15 (openSUSE Leap 15) or any supported Python 3.8+ version
+#### Scenario: Python 3.6+ compatibility
+- **WHEN** script runs on Python 3.6.15 (openSUSE Leap 15) or any supported Python 3.6+ version
 - **THEN** all version checking code executes without syntax or compatibility errors
 
 ### Requirement: Performance and Efficiency

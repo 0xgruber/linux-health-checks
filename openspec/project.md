@@ -4,7 +4,7 @@
 Linux Health Checks delivers a single Python utility (`linux_health_check.py`) that performs an end-to-end health and security audit across common Linux distributions. It inspects OS configuration, authentication controls, package/update status, storage capacity, networking posture, and iSCSI connectivity, ranks issues by severity, and exports/email reports for operators or automated cron jobs.
 
 ## Tech Stack
-- Python 3.8+ using only the standard library (logging, subprocess, json, xml, email, etc.)
+- Python 3.6+ using only the standard library (logging, subprocess, json, xml, email, etc.)
 - Native Linux tooling (`systemctl`, `ip`, `ss`, `df`, `grep`, `dnf|yum|apt|zypper|pacman`, `ethtool`, `iscsiadm`, `journalctl`, `nslookup`, `sensors`, etc.)
 - Optional GPG (`gnupg`) for report encryption and SMTP relay for outbound email delivery
 
