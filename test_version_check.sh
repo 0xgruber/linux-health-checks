@@ -140,8 +140,8 @@ test_distro "Debian 12 (Bookworm)" "debian:12" "apt-get update -qq && apt-get in
 test_distro "Debian 13 (Trixie)" "debian:13" "apt-get update -qq && apt-get install -y -qq python3 python3-urllib3 ca-certificates" 2
 test_distro "Ubuntu 22.04 LTS" "ubuntu:22.04" "apt-get update -qq && apt-get install -y -qq python3 python3-urllib3 ca-certificates" 3
 test_distro "Ubuntu 24.04 LTS" "ubuntu:24.04" "apt-get update -qq && apt-get install -y -qq python3 python3-urllib3 ca-certificates" 4
-test_distro "Rocky Linux 9" "rockylinux:9" "dnf install -y -q python3 ca-certificates" 5
-test_distro "Rocky Linux 9.5" "rockylinux:9.5" "dnf install -y -q python3 ca-certificates" 6
+test_distro "Rocky Linux 9.7" "quay.io/rockylinux/rockylinux:9.7" "dnf install -y -q python3 ca-certificates" 5
+test_distro "Rocky Linux 10.1" "quay.io/rockylinux/rockylinux:10.1" "dnf install -y -q python3 ca-certificates" 6
 test_distro "openSUSE Leap 15" "opensuse/leap:15" "zypper install -y python3 ca-certificates" 7
 test_distro "openSUSE Tumbleweed" "opensuse/tumbleweed:latest" "zypper install -y python3 ca-certificates" 8
 
@@ -154,7 +154,7 @@ echo ""
 PASS_COUNT=0
 FAIL_COUNT=0
 
-for distro in "Debian 12 (Bookworm)" "Debian 13 (Trixie)" "Ubuntu 22.04 LTS" "Ubuntu 24.04 LTS" "Rocky Linux 9" "Rocky Linux 9.5" "openSUSE Leap 15" "openSUSE Tumbleweed"; do
+for distro in "Debian 12 (Bookworm)" "Debian 13 (Trixie)" "Ubuntu 22.04 LTS" "Ubuntu 24.04 LTS" "Rocky Linux 9.7" "Rocky Linux 10.1" "openSUSE Leap 15" "openSUSE Tumbleweed"; do
     result="${RESULTS[$distro]:-UNKNOWN}"
     py_ver="${PYTHON_VERSIONS[$distro]:-N/A}"
     if [[ "$result" == "PASS" ]]; then
@@ -185,7 +185,7 @@ echo "" >> "$RESULTS_FILE"
 echo "| Distribution | Python Version | Syntax Valid | urllib Available | Version Functions | Result |" >> "$RESULTS_FILE"
 echo "|--------------|----------------|--------------|------------------|-------------------|--------|" >> "$RESULTS_FILE"
 
-for distro in "Debian 12 (Bookworm)" "Debian 13 (Trixie)" "Ubuntu 22.04 LTS" "Ubuntu 24.04 LTS" "Rocky Linux 9" "Rocky Linux 9.5" "openSUSE Leap 15" "openSUSE Tumbleweed"; do
+for distro in "Debian 12 (Bookworm)" "Debian 13 (Trixie)" "Ubuntu 22.04 LTS" "Ubuntu 24.04 LTS" "Rocky Linux 9.7" "Rocky Linux 10.1" "openSUSE Leap 15" "openSUSE Tumbleweed"; do
     result="${RESULTS[$distro]:-UNKNOWN}"
     py_ver="${PYTHON_VERSIONS[$distro]:-N/A}"
     if [[ "$result" == "PASS" ]]; then
