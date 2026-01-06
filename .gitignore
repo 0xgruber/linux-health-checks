@@ -35,6 +35,8 @@ env/
 # OS
 .DS_Store
 Thumbs.db
+._*
+.directory
 
 # Output files
 health_report*.md
@@ -48,12 +50,31 @@ health_report*.gpg
 /tmp/
 test_reports/
 
-# Test results (keep the summary report)
+# Test results (keep TEST_REPORT.md)
 test_results/*.log
 test_results/*.json
 test_results/*.build
 test_results/Dockerfile.*
 test_results/*.status
+
+# Test coverage (for future)
+.coverage
+htmlcov/
+.pytest_cache/
+.tox/
+coverage.xml
+*.cover
+.cache/
+nosetests.xml
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.orig
+
+# Linux trash
+.Trash-*/
 
 # Sensitive configuration (if created)
 .env

@@ -1,0 +1,146 @@
+name: Comprehensive Test Suite
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:  # Manual trigger button
+
+permissions:
+  contents: write      # For auto-merge
+  pull-requests: write # For comments and auto-merge
+  issues: write        # For creating issues on failure
+
+jobs:
+  test:
+    name: Test All Distributions
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Make test script executable
+        run: chmod +x test_suite.sh
+      
+      - name: Run comprehensive test suite
+        id: tests
+        run: |
+          ./test_suite.sh 2>&1 | tee test_output.log
+          echo "exit_code=${PIPESTATUS[0]}" >> $GITHUB_OUTPUT
+      
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: |
+            TEST_REPORT.md
+            test_output.log
+            test_results/*.log
+          retention-days: 30
+      
+      - name: Comment PR with results (success)
+        if: steps.tests.outputs.exit_code == '0' && github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '✅ **All tests passed!**\n\n' +
+                    '**8/8 distributions tested successfully:**\n' +
+                    '- Debian 12 (Bookworm) & 13 (Trixie)\n' +
+                    '- Ubuntu 22.04 LTS & 24.04 LTS\n' +
+                    '- Rocky Linux 9.7 & 10.1\n' +
+                    '- openSUSE Leap 15 & Tumbleweed\n\n' +
+                    '**All features validated:**\n' +
+                    '- Health checks (35+ checks)\n' +
+                    '- Version checking (enabled & disabled)\n' +
+                    '- Export formats (Markdown, JSON, XML, text)\n' +
+                    '- Exit codes & Python compatibility\n\n' +
+                    'See [workflow artifacts](https://github.com/' + context.repo.owner + '/' + context.repo.repo + '/actions/runs/' + context.runId + ') for detailed reports.'
+            })
+      
+      - name: Comment PR with results (failure)
+        if: steps.tests.outputs.exit_code != '0' && github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const log = fs.readFileSync('test_output.log', 'utf8');
+            const lastLines = log.split('\n').slice(-50).join('\n');
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '❌ **Test suite failed!**\n\n' +
+                    'One or more tests did not pass. Please review the failure details below.\n\n' +
+                    '### Last 50 Lines of Output\n```\n' + lastLines + '\n```\n\n' +
+                    'See [full workflow logs](https://github.com/' + context.repo.owner + '/' + context.repo.repo + '/actions/runs/' + context.runId + ') for complete details.'
+            })
+      
+      - name: Create issue on test failure
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const log = fs.readFileSync('test_output.log', 'utf8');
+            const lastLines = log.split('\n').slice(-50).join('\n');
+            
+            github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: '❌ Test Suite Failed - ' + new Date().toISOString().split('T')[0],
+              body: '## Test Failure Report\n\n' +
+                    '**Triggered by:** ' + (context.payload.pull_request ? 'PR #' + context.payload.pull_request.number : 'Manual run') + '\n' +
+                    '**Commit:** `' + context.sha.substring(0, 7) + '`\n' +
+                    '**Author:** @' + context.actor + '\n' +
+                    '**Runner:** ubuntu-24.04\n' +
+                    '**Date:** ' + new Date().toISOString() + '\n\n' +
+                    '### Failure Summary\n\n' +
+                    'The comprehensive test suite failed on one or more distributions. ' +
+                    'This may indicate a regression or environment issue.\n\n' +
+                    '### Last 50 Lines of Output\n```\n' + lastLines + '\n```\n\n' +
+                    '### Actions Required\n\n' +
+                    '1. Review the [workflow run](' + context.payload.repository.html_url + '/actions/runs/' + context.runId + ') for full logs\n' +
+                    '2. Identify which distribution(s) failed\n' +
+                    '3. Reproduce locally: `./test_suite.sh`\n' +
+                    '4. Fix the issue and push updates\n' +
+                    '5. Close this issue once resolved\n\n' +
+                    '### Test Coverage\n\n' +
+                    'The test suite validates:\n' +
+                    '- ✅ 8 distributions (Debian, Ubuntu, Rocky Linux, openSUSE)\n' +
+                    '- ✅ 8 tests per distribution (64 total tests)\n' +
+                    '- ✅ All features (health checks, version checking, exports)\n',
+              labels: ['test-failure', 'ci', 'bug']
+            })
+      
+      - name: Auto-merge PR if tests pass
+        if: steps.tests.outputs.exit_code == '0' && github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            try {
+              await github.rest.pulls.merge({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: context.payload.pull_request.number,
+                merge_method: 'merge',
+                commit_title: 'Auto-merge: ' + context.payload.pull_request.title,
+                commit_message: 'All tests passed. Auto-merged by GitHub Actions.'
+              });
+              console.log('✅ PR auto-merged successfully');
+            } catch (error) {
+              console.log('⚠️ Auto-merge failed (may require branch protection rules):', error.message);
+              // Don't fail the workflow if auto-merge doesn't work
+            }
+      
+      - name: Fail workflow if tests failed
+        if: steps.tests.outputs.exit_code != '0'
+        run: |
+          echo "❌ Tests failed with exit code ${{ steps.tests.outputs.exit_code }}"
+          exit 1
