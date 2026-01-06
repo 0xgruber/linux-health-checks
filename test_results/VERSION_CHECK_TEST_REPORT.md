@@ -165,6 +165,23 @@ Upgrade instructions:
 Changelog: https://github.com/0xgruber/linux-health-checks/releases/tag/v1.0.0
 ```
 
+### Update Notification Verification (Additional Testing)
+
+**Date**: 2026-01-06 05:50:00 UTC  
+**Test**: Simulated v0.9.0 to verify update notification display
+
+✅ **Verified on multiple distributions**:
+- **Debian 12**: Update notification displayed correctly
+- **Rocky Linux 9**: Update notification displayed correctly  
+- **openSUSE Leap 15**: Update notification displayed correctly
+
+All distributions successfully:
+1. ✅ Detected version mismatch (0.9.0 vs 1.0.0)
+2. ✅ Displayed INFO-level notification
+3. ✅ Showed wget upgrade instructions
+4. ✅ Included changelog link
+5. ✅ Continued with health checks without errors
+
 ## Security Considerations
 
 ✅ **HTTPS only**: All GitHub API requests use HTTPS  
