@@ -8,7 +8,9 @@
 # Requires: Docker installed
 #
 
-set -e
+# Note: set -e is NOT used because we want to continue testing even if individual tests fail
+set -u  # Exit on undefined variables
+set -o pipefail  # Catch errors in pipes
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SCRIPT_PATH="${SCRIPT_DIR}/linux_health_check.py"
@@ -154,8 +156,11 @@ test_distro() {
     # Test 7: Version check disabled
     echo -n "  [7/8] Testing DISABLE_VERSION_CHECK... "
     OUTPUT=$(docker run --rm -e DISABLE_VERSION_CHECK=1 -v "$SCRIPT_PATH:/script.py:ro" "$docker_image" sh -c "$install_cmd >/dev/null 2>&1 && timeout 10 python3 /script.py 2>&1" || true)
-    HAS_CHECK_LOG=$(echo "$OUTPUT" | grep -c "Checking for script updates" || echo 0)
-    HAS_UPDATE_MSG=$(echo "$OUTPUT" | grep -c "New version available" || echo 0)
+    HAS_CHECK_LOG=$(echo "$OUTPUT" | grep -c "Checking for script updates" || true)
+    HAS_UPDATE_MSG=$(echo "$OUTPUT" | grep -c "New version available" || true)
+    # Ensure numeric values (grep -c should return a number, but sanitize just in case)
+    HAS_CHECK_LOG=${HAS_CHECK_LOG:-0}
+    HAS_UPDATE_MSG=${HAS_UPDATE_MSG:-0}
     
     if [[ $HAS_CHECK_LOG -gt 0 ]] && [[ $HAS_UPDATE_MSG -eq 0 ]]; then
         echo -e "${GREEN}✓ PASSED${NC}"
