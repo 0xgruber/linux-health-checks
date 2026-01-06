@@ -1,6 +1,6 @@
 # Linux Health Checks
 
-[![Version](https://img.shields.io/badge/version-1.1.0-blue.svg)](https://github.com/0xgruber/linux-health-checks/releases)
+[![Version](https://img.shields.io/badge/version-1.2.0-blue.svg)](https://github.com/0xgruber/linux-health-checks/releases)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/python-3.6%2B-blue.svg)](https://www.python.org/)
 [![Debian](https://img.shields.io/badge/Debian-12%20%7C%2013-red.svg)](https://www.debian.org/)
@@ -12,11 +12,56 @@
 Comprehensive cross-distribution health and security audit script for Linux servers. The script performs 35+ distinct checks across security, system health, storage, packages, networking, and iSCSI, ranks findings by severity (Critical/High/Medium/Low/Info), and produces exportable reports with optional GPG encryption and email delivery.
 
 **Author:** Aaron Gruber <aaron@gizmobear.io>  
-**Version:** 1.1.0 ([Semantic Versioning](https://semver.org/))  
+**Version:** 1.2.0 ([Semantic Versioning](https://semver.org/))  
 **License:** MIT  
 **Repository:** https://github.com/0xgruber/linux-health-checks
 
 ## Key Features
+
+### Configuration
+
+Customize the script without modifying code using an external configuration file.
+
+**Quick Start:**
+```bash
+# Copy example config
+cp health_check.cfg.example health_check.cfg
+
+# Edit your settings
+nano health_check.cfg
+
+# Config file is git-ignored, won't be overwritten on updates
+```
+
+**Configuration Priority:**
+1. **Environment variables** (highest priority) - temporary overrides
+2. **Config file** (`health_check.cfg`) - persistent settings
+3. **Hardcoded defaults** (fallback)
+
+**Available Settings:**
+- **Output**: Report directory and filename
+- **Email**: SMTP delivery settings (enabled, from, to, subject)
+- **SMTP**: Server connection details (server, port, TLS, credentials)
+- **GPG**: Encryption options (encrypt, recipient, delete_unencrypted)
+- **Thresholds**: System health warning/critical levels (filesystem, memory, load)
+- **Version Check**: GitHub update notifications (enabled, timeout)
+
+See [`health_check.cfg.example`](health_check.cfg.example) for complete documentation with examples.
+
+**Security Note:**
+```bash
+# Protect config if it contains credentials
+chmod 600 health_check.cfg
+```
+
+**Example Environment Variable Override:**
+```bash
+# Override filesystem warning threshold for one-time check
+FILESYSTEM_WARNING=75 sudo ./linux_health_check.py
+
+# Override multiple values
+OUTPUT_DIR=/var/log/health FILESYSTEM_WARNING=70 sudo ./linux_health_check.py
+```
 
 ### Cross-Distribution Support
 
