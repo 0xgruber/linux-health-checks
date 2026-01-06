@@ -1,0 +1,216 @@
+# Linux Health Check Configuration File - Example
+#
+# Copy this file to 'health_check.cfg' in the same directory as the
+# linux_health_check.py script and customize the values below.
+#
+# The health_check.cfg file is git-ignored so your settings won't be
+# overwritten when you update the script.
+#
+# Configuration Priority:
+# 1. Environment variables (highest priority)
+# 2. This config file (health_check.cfg)
+# 3. Hardcoded defaults in the script (lowest priority)
+#
+# Security Note:
+# If this file contains sensitive information (SMTP passwords, etc.),
+# restrict file permissions: chmod 600 health_check.cfg
+
+# ==============================================================================
+# OUTPUT CONFIGURATION
+# ==============================================================================
+[output]
+# Directory where reports will be saved
+# Default: /root (if running as root), otherwise /tmp
+# output_dir = /var/log/health-checks
+
+# ==============================================================================
+# EMAIL CONFIGURATION
+# ==============================================================================
+[email]
+# Enable email delivery of reports
+# Type: boolean (true/false)
+# Default: false
+# enabled = false
+
+# Email address to send reports from
+# Type: string
+# Default: root@localhost
+# from = healthcheck@example.com
+
+# Email address(es) to send reports to (comma-separated for multiple)
+# Type: string
+# Default: root@localhost
+# to = admin@example.com,ops@example.com
+
+# Email subject line (supports {hostname} placeholder)
+# Type: string
+# Default: "Health Check Report - {hostname}"
+# subject = System Health Report for {hostname}
+
+# ==============================================================================
+# SMTP CONFIGURATION
+# ==============================================================================
+[smtp]
+# SMTP server hostname or IP address
+# Type: string
+# Default: localhost
+# server = smtp.example.com
+
+# SMTP server port
+# Type: integer
+# Common ports: 25 (plain), 587 (STARTTLS), 465 (SSL)
+# Default: 25
+# port = 587
+
+# Use TLS encryption for SMTP connection
+# Type: boolean (true/false)
+# Default: false
+# use_tls = true
+
+# SMTP authentication username (leave empty if no auth required)
+# Type: string
+# Default: (empty)
+# username = healthcheck@example.com
+
+# SMTP authentication password (leave empty if no auth required)
+# Type: string
+# Default: (empty)
+# SECURITY WARNING: This password is stored in plain text!
+# Consider using file permissions (chmod 600) to protect this file
+# password = your_smtp_password_here
+
+# ==============================================================================
+# GPG ENCRYPTION CONFIGURATION
+# ==============================================================================
+[gpg]
+# Enable GPG encryption of report files
+# Type: boolean (true/false)
+# Default: false
+# encrypt = true
+
+# GPG recipient email address or key ID
+# Type: string
+# Default: root@localhost
+# recipient = security@example.com
+
+# Delete unencrypted report after GPG encryption
+# Type: boolean (true/false)
+# Default: false
+# delete_unencrypted = true
+
+# ==============================================================================
+# SYSTEM HEALTH THRESHOLDS
+# ==============================================================================
+[thresholds]
+# Filesystem usage warning threshold (percentage)
+# Type: integer (0-100)
+# Default: 80
+# filesystem_warning = 85
+
+# Filesystem usage critical threshold (percentage)
+# Type: integer (0-100)
+# Default: 90
+# filesystem_critical = 95
+
+# Memory usage warning threshold (percentage)
+# Type: integer (0-100)
+# Default: 80
+# memory_warning = 75
+
+# Memory usage critical threshold (percentage)
+# Type: integer (0-100)
+# Default: 90
+# memory_critical = 85
+
+# Load average warning threshold (percentage of CPU count)
+# Type: integer
+# Default: 200 (2.0x CPU count)
+# load_warning = 150
+
+# Load average critical threshold (percentage of CPU count)
+# Type: integer
+# Default: 300 (3.0x CPU count)
+# load_critical = 250
+
+# ==============================================================================
+# VERSION CHECK CONFIGURATION
+# ==============================================================================
+[version_check]
+# GitHub repository for version checking (format: owner/repo)
+# Type: string
+# Default: 0xgruber/linux-health-checks
+# github_repo = 0xgruber/linux-health-checks
+
+# Timeout for version check HTTP request (seconds)
+# Type: integer
+# Default: 5
+# timeout = 10
+
+# Enable automatic version checking
+# Type: boolean (true/false)
+# Default: true
+# enabled = false
+
+# ==============================================================================
+# USAGE EXAMPLES
+# ==============================================================================
+# 
+# Example 1: Basic email setup with Gmail
+# ----------------------------------------
+# [email]
+# enabled = true
+# from = healthcheck@yourdomain.com
+# to = admin@yourdomain.com
+# subject = Health Check Report - {hostname}
+# 
+# [smtp]
+# server = smtp.gmail.com
+# port = 587
+# use_tls = true
+# username = your-email@gmail.com
+# password = your-app-password
+#
+# Example 2: Production server with stricter thresholds
+# ------------------------------------------------------
+# [thresholds]
+# filesystem_warning = 70
+# filesystem_critical = 85
+# memory_warning = 70
+# memory_critical = 85
+# load_warning = 150
+# load_critical = 200
+#
+# Example 3: High-security environment with GPG encryption
+# ---------------------------------------------------------
+# [gpg]
+# encrypt = true
+# recipient = security-team@example.com
+# delete_unencrypted = true
+#
+# [email]
+# enabled = true
+# from = healthcheck@example.com
+# to = security-team@example.com
+#
+# ==============================================================================
+# ENVIRONMENT VARIABLE OVERRIDES
+# ==============================================================================
+# 
+# You can override any setting using environment variables with uppercase names:
+# 
+#   OUTPUT_DIR=/var/log/health sudo ./linux_health_check.py
+#   FILESYSTEM_WARNING=75 ./linux_health_check.py
+#   SMTP_SERVER=smtp.corp.local EMAIL_ENABLED=true ./linux_health_check.py
+# 
+# Environment variables take precedence over config file values.
+#
+# ==============================================================================
+# VALIDATION NOTES
+# ==============================================================================
+#
+# - Threshold values must be between 0-100 (percentages)
+# - Port numbers must be valid integers (1-65535)
+# - Boolean values accept: true/false, yes/no, 1/0
+# - Invalid values will generate warnings and fall back to defaults
+# - Unknown sections or keys will be ignored with a warning
+#

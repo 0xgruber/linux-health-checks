@@ -6,7 +6,7 @@ Description: Comprehensive health and security audit for Linux systems
 License: MIT
 """
 
-__version__ = "1.1.0"
+__version__ = "1.2.0"
 
 import os
 import sys
@@ -25,50 +25,142 @@ from email.mime.base import MIMEBase
 from email import encoders
 import urllib.request
 import urllib.error
+import configparser
+import stat
 
 # ============================================================================
 # CONFIGURATION
 # ============================================================================
+#
+# You can customize these settings by creating a health_check.cfg file
+# in the same directory as this script. See health_check.cfg.example
+# for a template with all available options.
+#
+# The script will load settings from health_check.cfg if it exists,
+# otherwise it will use the defaults below.
+#
+# Configuration priority: Environment Variables > Config File > Defaults
+# ============================================================================
 
-OUTPUT_DIR = "/root" if os.geteuid() == 0 else "/tmp"
+# Try to load user configuration
+_config = None
+_has_config = False
+
+try:
+    _script_dir = os.path.dirname(os.path.abspath(__file__))
+    _config_file = os.path.join(_script_dir, "health_check.cfg")
+
+    if os.path.exists(_config_file):
+        # Check file permissions for security
+        _file_stat = os.stat(_config_file)
+        if _file_stat.st_mode & (
+            stat.S_IRGRP | stat.S_IROTH | stat.S_IWGRP | stat.S_IWOTH
+        ):
+            print("⚠️  WARNING: Config file is readable or writable by others")
+            print("   Consider: chmod 600 health_check.cfg")
+
+        # Load config file
+        _config = configparser.ConfigParser()
+        _config.read(_config_file)
+        print(f"✓ Loaded configuration from: {_config_file}")
+        _has_config = True
+    else:
+        print("ℹ️  No config file found, using defaults")
+        print(f"   Create {_config_file} to customize settings")
+        _has_config = False
+except Exception as _e:
+    print(f"⚠️  WARNING: Error loading config: {_e}")
+    print("   Using default configuration")
+    _has_config = False
+
+
+def _cfg(section, key, default, value_type=str):
+    """
+    Get config value from environment, config file, or default.
+
+    Priority: Environment Variable > Config File > Default
+
+    Args:
+        section: INI section name (e.g., 'output', 'email', 'smtp')
+        key: Configuration key name (e.g., 'output_dir', 'enabled')
+        default: Default value if not found in env or config
+        value_type: Expected type (str, int, float, bool)
+
+    Returns:
+        Configuration value with proper type
+    """
+    # Priority 1: Environment variable (uppercase key name)
+    env_key = key.upper()
+    env_val = os.getenv(env_key)
+    if env_val is not None:
+        try:
+            if value_type is bool:
+                return env_val.lower() in ("true", "1", "yes", "on")
+            elif value_type is int:
+                return int(env_val)
+            elif value_type is float:
+                return float(env_val)
+            else:
+                return env_val
+        except (ValueError, TypeError):
+            pass  # Fall through to config file or default
+
+    # Priority 2: Config file
+    if _has_config and _config and _config.has_option(section, key):
+        try:
+            if value_type is bool:
+                return _config.getboolean(section, key)
+            elif value_type is int:
+                return _config.getint(section, key)
+            elif value_type is float:
+                return _config.getfloat(section, key)
+            else:
+                return _config.get(section, key)
+        except (ValueError, TypeError, configparser.Error):
+            pass  # Fall through to default
+
+    # Priority 3: Default value
+    return default
+
+
+# Configuration values (with config file support)
+OUTPUT_DIR = str(_cfg("output", "output_dir", "/root" if os.geteuid() == 0 else "/tmp"))
 OUTPUT_FILE = os.path.join(OUTPUT_DIR, "health_report.txt")
 
-# Email Configuration (set to None to disable)
-EMAIL_ENABLED = False
-EMAIL_TO = None  # "admin@example.com"
-EMAIL_FROM = None  # "health-check@example.com"
-EMAIL_SUBJECT = "Linux Health Check Report - {hostname}"
+# Email Configuration
+EMAIL_ENABLED = bool(_cfg("email", "enabled", False, bool))
+EMAIL_TO = str(_cfg("email", "to", "root@localhost"))
+EMAIL_FROM = str(_cfg("email", "from", "root@localhost"))
+EMAIL_SUBJECT = str(_cfg("email", "subject", "Linux Health Check Report - {hostname}"))
 
 # SMTP Configuration
-SMTP_SERVER = None  # "smtp.example.com"
-SMTP_PORT = 587
-SMTP_USE_TLS = True
-SMTP_USERNAME = None
-SMTP_PASSWORD = None
+SMTP_SERVER = str(_cfg("smtp", "server", "localhost"))
+SMTP_PORT = int(_cfg("smtp", "port", 25, int))
+SMTP_USE_TLS = bool(_cfg("smtp", "use_tls", False, bool))
+SMTP_USERNAME = str(_cfg("smtp", "username", ""))
+SMTP_PASSWORD = str(_cfg("smtp", "password", ""))
 
-# GPG Configuration (set to None to disable encryption)
-GPG_ENABLED = False
-GPG_RECIPIENT = None  # "admin@example.com"
+# GPG Configuration
+GPG_ENABLED = bool(_cfg("gpg", "encrypt", False, bool))
+GPG_RECIPIENT = str(_cfg("gpg", "recipient", "root@localhost"))
+GPG_DELETE_UNENCRYPTED = bool(_cfg("gpg", "delete_unencrypted", False, bool))
 
 # Policy Thresholds
-FILESYSTEM_WARNING_THRESHOLD = 85
-FILESYSTEM_CRITICAL_THRESHOLD = 98
-MEMORY_WARNING_THRESHOLD = 85
-MEMORY_CRITICAL_THRESHOLD = 95
-LOAD_WARNING_MULTIPLIER = 0.7
-LOAD_CRITICAL_MULTIPLIER = 1.0
+FILESYSTEM_WARNING_THRESHOLD = int(_cfg("thresholds", "filesystem_warning", 80, int))
+FILESYSTEM_CRITICAL_THRESHOLD = int(_cfg("thresholds", "filesystem_critical", 90, int))
+MEMORY_WARNING_THRESHOLD = int(_cfg("thresholds", "memory_warning", 80, int))
+MEMORY_CRITICAL_THRESHOLD = int(_cfg("thresholds", "memory_critical", 90, int))
+LOAD_WARNING_MULTIPLIER = (
+    float(int(_cfg("thresholds", "load_warning", 200, int))) / 100.0
+)
+LOAD_CRITICAL_MULTIPLIER = (
+    float(int(_cfg("thresholds", "load_critical", 300, int))) / 100.0
+)
 
 # Version Checking Configuration
-GITHUB_REPO = "0xgruber/linux-health-checks"
-timeout_env = os.getenv("VERSION_CHECK_TIMEOUT")
-try:
-    VERSION_CHECK_TIMEOUT = int(timeout_env) if timeout_env is not None else 3
-except ValueError:
-    logging.warning(
-        "Invalid VERSION_CHECK_TIMEOUT value %r; falling back to default 3 seconds",
-        timeout_env,
-    )
-    VERSION_CHECK_TIMEOUT = 3
+GITHUB_REPO = str(_cfg("version_check", "github_repo", "0xgruber/linux-health-checks"))
+VERSION_CHECK_ENABLED = bool(_cfg("version_check", "enabled", True, bool))
+VERSION_CHECK_TIMEOUT = int(_cfg("version_check", "timeout", 5, int))
 
 # ============================================================================
 # GLOBAL STATE

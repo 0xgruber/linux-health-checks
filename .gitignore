@@ -80,3 +80,6 @@ nosetests.xml
 .env
 config.local.py
 credentials.json
+
+# User configuration file (keep example, ignore actual config)
+health_check.cfg
