@@ -1,0 +1,54 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual environments
+venv/
+ENV/
+env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Output files
+health_report*.md
+health_report*.json
+health_report*.xml
+health_report*.txt
+health_report*.gpg
+*.log
+
+# Test output
+/tmp/
+test_reports/
+
+# Sensitive configuration (if created)
+.env
+config.local.py
+credentials.json
