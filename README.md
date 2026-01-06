@@ -596,22 +596,58 @@ df -h /root
 
 We welcome contributions! See [IMPROVEMENTS.md](IMPROVEMENTS.md) for a list of planned enhancements.
 
+### Testing
+
+The project includes a comprehensive test suite that validates all features across 8 supported distributions.
+
+#### Running Tests Locally
+
+```bash
+# Run comprehensive test suite (all 8 distributions)
+./test_suite.sh
+
+# Expected runtime: ~15 minutes
+# Requires: Docker installed and running
+```
+
+#### Test Coverage
+
+The test suite validates:
+- ✅ **8 distributions**: Debian 12/13, Ubuntu 22.04/24.04, Rocky Linux 9.7/10.1, openSUSE Leap 15/Tumbleweed
+- ✅ **8 tests per distribution**: Syntax, dependencies, health checks, exports, version checking, exit codes
+- ✅ **All features**: Health checks (35+), version checking, export formats, configuration
+- ✅ **Python compatibility**: 3.6.15 - 3.13.5
+
+#### Continuous Integration
+
+Tests run automatically on every pull request via GitHub Actions:
+- ✅ All tests must pass before merge
+- ✅ Auto-merge on success (no manual approval needed)
+- ❌ GitHub Issue created automatically on failure
+- 📊 Test results posted as PR comments
+- 📦 Test artifacts retained for 30 days
+
+**See [TEST_REPORT.md](TEST_REPORT.md) for detailed test results and methodology.**
+
 ### How to Contribute
 
 1. **Fork the repository** on GitHub
 2. **Create a feature branch**: `git checkout -b feature/your-feature-name`
 3. **Make your changes** with clear, descriptive commits
-4. **Test thoroughly** on multiple distributions if possible
+4. **Test locally**: Run `./test_suite.sh` to validate changes
 5. **Submit a pull request** with a detailed description
+
+GitHub Actions will automatically test your PR on all 8 distributions.
 
 ### Development Guidelines
 
 - Maintain Python 3.6+ compatibility
 - No external pip dependencies (stdlib only)
 - Follow existing code style and patterns
-- Add tests for new functionality when possible
+- **Run test suite** before submitting PRs: `./test_suite.sh`
 - Update documentation (README.md, comments)
 - Consider cross-distribution compatibility
+- Tests must pass on all 8 distributions
 
 ### Reporting Issues
 
