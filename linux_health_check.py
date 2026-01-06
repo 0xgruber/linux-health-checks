@@ -97,8 +97,33 @@ def _cfg(key: str, default):
 
     # Priority 2: Config file
     if _has_config and hasattr(_config, key):
-        return getattr(_config, key)
+        cfg_val = getattr(_config, key)
 
+        # Normalize type based on the default value's type, similar to env handling
+        if isinstance(default, bool):
+            if isinstance(cfg_val, bool):
+                return cfg_val
+            if isinstance(cfg_val, str):
+                return cfg_val.lower() in ("true", "1", "yes")
+            if isinstance(cfg_val, int):
+                return bool(cfg_val)
+            return default
+        elif isinstance(default, int):
+            if isinstance(cfg_val, int):
+                return cfg_val
+            try:
+                return int(cfg_val)
+            except (ValueError, TypeError):
+                return default
+        elif isinstance(default, float):
+            if isinstance(cfg_val, float) or isinstance(cfg_val, int):
+                return float(cfg_val)
+            try:
+                return float(cfg_val)
+            except (ValueError, TypeError):
+                return default
+
+        return cfg_val
     # Priority 3: Default
     return default
 
