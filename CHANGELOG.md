@@ -28,7 +28,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - All version check errors fail silently (logged at DEBUG level only)
 
 ### Changed
-- Version number format from date-based (YYYY.MM.DD) to Semantic Versioning (MAJOR.MINOR.PATCH)
+- Bumped version number from `1.0.0` to `1.1.0` (continuing to follow Semantic Versioning)
 - Script now displays version `1.1.0` instead of `1.0.0`
 
 ## [1.0.0] - 2026-01-06
