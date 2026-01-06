@@ -37,7 +37,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 #### Core Features
 - **35+ automated health and security checks** across 6 categories
-- **Zero-dependency design** - Uses only Python 3.8+ standard library
+- **Zero-dependency design** - Uses only Python 3.6+ standard library
 - **Multi-format export** - Markdown (default), JSON, XML, plain text
 - **GPG encryption support** - Protect sensitive health reports
 - **SMTP email delivery** - Send reports via email with attachments

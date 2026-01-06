@@ -2,7 +2,7 @@
 
 [![Version](https://img.shields.io/badge/version-1.1.0-blue.svg)](https://github.com/0xgruber/linux-health-checks/releases)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
-[![Python](https://img.shields.io/badge/python-3.8%2B-blue.svg)](https://www.python.org/)
+[![Python](https://img.shields.io/badge/python-3.6%2B-blue.svg)](https://www.python.org/)
 [![Debian](https://img.shields.io/badge/Debian-12%20%7C%2013-red.svg)](https://www.debian.org/)
 [![Ubuntu](https://img.shields.io/badge/Ubuntu-22.04%20%7C%2024.04-orange.svg)](https://ubuntu.com/)
 [![Rocky](https://img.shields.io/badge/Rocky-9%20%7C%2010-green.svg)](https://rockylinux.org/)
@@ -175,7 +175,7 @@ GitHub API allows 60 requests/hour for unauthenticated requests. If you run the 
 ## Requirements
 
 ### Python Environment
-- Python 3.8 or higher
+- Python 3.6 or higher
 - Standard library only - no pip dependencies required
 - Modules used: `os`, `re`, `subprocess`, `sys`, `logging`, `pathlib`, `json`, `xml.etree.ElementTree`, `datetime`, `collections`, `typing`, `smtplib`, `email`, `urllib.request`, `urllib.error`
 
@@ -606,7 +606,7 @@ We welcome contributions! See [IMPROVEMENTS.md](IMPROVEMENTS.md) for a list of p
 
 ### Development Guidelines
 
-- Maintain Python 3.8+ compatibility
+- Maintain Python 3.6+ compatibility
 - No external pip dependencies (stdlib only)
 - Follow existing code style and patterns
 - Add tests for new functionality when possible
