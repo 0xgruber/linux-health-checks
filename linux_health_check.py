@@ -60,7 +60,15 @@ LOAD_CRITICAL_MULTIPLIER = 1.0
 
 # Version Checking Configuration
 GITHUB_REPO = "0xgruber/linux-health-checks"
-VERSION_CHECK_TIMEOUT = int(os.getenv("VERSION_CHECK_TIMEOUT", "3"))
+timeout_env = os.getenv("VERSION_CHECK_TIMEOUT")
+try:
+    VERSION_CHECK_TIMEOUT = int(timeout_env) if timeout_env is not None else 3
+except ValueError:
+    logging.warning(
+        "Invalid VERSION_CHECK_TIMEOUT value %r; falling back to default 3 seconds",
+        timeout_env,
+    )
+    VERSION_CHECK_TIMEOUT = 3
 
 # ============================================================================
 # GLOBAL STATE
