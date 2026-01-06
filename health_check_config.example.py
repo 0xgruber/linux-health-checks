@@ -135,10 +135,16 @@ VERSION_CHECK_TIMEOUT = 3
 # ADVANCED CONFIGURATION
 # ============================================================================
 
-# Enable verbose logging for debugging
+# Reserved for future use: verbose logging for debugging
+# NOTE: The current linux_health_check.py script does not read VERBOSE_LOGGING,
+# so changing this value (or setting the corresponding environment variable)
+# has no effect.
 # VERBOSE_LOGGING = False
 
-# Custom log format
+# Reserved for future use: custom log format
+# NOTE: The current linux_health_check.py script does not read LOG_FORMAT,
+# so changing this value (or setting the corresponding environment variable)
+# has no effect.
 # LOG_FORMAT = "%(asctime)s - %(levelname)s - %(message)s"
 
 # ============================================================================
