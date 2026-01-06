@@ -36,9 +36,42 @@ This document outlines potential enhancements and features that could be added t
   - Fleet-wide health overview
 - **Technology**: Lightweight Flask/FastAPI with minimal dependencies
 
+### 5. Installation as a Service
+- **Description**: Install script as a systemd/init.d service for automated execution
+- **Benefits**:
+  - Automated periodic health checks without cron
+  - System integration with proper logging
+  - Auto-start on boot
+  - Service management (start/stop/restart/status)
+- **Implementation**:
+  - Systemd unit file: `/etc/systemd/system/linux-health-check.service`
+  - Timer unit for scheduling: `/etc/systemd/system/linux-health-check.timer`
+  - Install command: `./linux_health_check.py --install-service`
+  - Uninstall command: `./linux_health_check.py --uninstall-service`
+- **Example**: `systemctl enable --now linux-health-check.timer`
+
 ## Medium Priority Enhancements
 
-### 5. Baseline Comparison
+### 6. Automated Update Checking
+- **Description**: Check for new script versions and notify administrators
+- **Benefits**:
+  - Stay current with security patches
+  - Receive bug fixes automatically
+  - Get notified of new features
+  - Maintain best practices
+- **Implementation**:
+  - Check GitHub releases API for newer versions
+  - Compare semantic versions (current vs latest)
+  - Optional auto-update with `--auto-update` flag
+  - Update check frequency configurable (daily/weekly)
+  - Notify via report or separate alert
+- **Safety**: 
+  - Verify GPG signatures before updating
+  - Backup current version before upgrade
+  - Rollback capability if update fails
+- **Usage**: `linux_health_check.py --check-updates` or automatic on run
+
+### 7. Baseline Comparison
 - **Description**: Compare current state against known-good baseline
 - **Benefits**:
   - Drift detection
@@ -46,7 +79,7 @@ This document outlines potential enhancements and features that could be added t
   - Change tracking
 - **Example**: `linux_health_check.py --baseline /etc/health-check/baseline.json --compare`
 
-### 6. Remediation Suggestions
+### 8. Remediation Suggestions
 - **Description**: Include actionable remediation steps for each issue
 - **Benefits**:
   - Faster resolution
@@ -54,7 +87,7 @@ This document outlines potential enhancements and features that could be added t
   - Automation possibilities
 - **Example**: For "SSH enabled" issue, suggest `systemctl disable sshd`
 
-### 7. Compliance Profiles
+### 9. Compliance Profiles
 - **Description**: Pre-built check profiles for CIS, STIG, PCI-DSS, etc.
 - **Benefits**:
   - Standardized security auditing
@@ -62,7 +95,7 @@ This document outlines potential enhancements and features that could be added t
   - Industry best practices
 - **Usage**: `linux_health_check.py --profile cis-rhel8-level1`
 
-### 8. Containerized Checks
+### 10. Containerized Checks
 - **Description**: Detect and validate Docker/Podman containers and images
 - **Benefits**:
   - Container security scanning
@@ -73,7 +106,7 @@ This document outlines potential enhancements and features that could be added t
   - Containers without resource limits
   - Privileged containers
 
-### 9. Performance Metrics Collection
+### 11. Performance Metrics Collection
 - **Description**: Collect detailed performance metrics over time
 - **Benefits**:
   - Performance regression detection
@@ -84,7 +117,7 @@ This document outlines potential enhancements and features that could be added t
   - Network throughput
   - Process CPU/memory over time
 
-### 10. Alert Thresholds Per Host
+### 12. Alert Thresholds Per Host
 - **Description**: Different thresholds for different server roles
 - **Benefits**:
   - Reduced false positives
@@ -94,12 +127,12 @@ This document outlines potential enhancements and features that could be added t
 
 ## Low Priority / Nice-to-Have
 
-### 11. Multi-Language Support
+### 13. Multi-Language Support
 - **Description**: Internationalization of report output
 - **Benefits**: Global team support, localized documentation
 - **Languages**: Start with English, Spanish, French, German, Japanese
 
-### 12. Integration with Monitoring Systems
+### 14. Integration with Monitoring Systems
 - **Description**: Native integrations with Prometheus, Grafana, Nagios, Zabbix
 - **Benefits**: 
   - Centralized monitoring
@@ -107,7 +140,7 @@ This document outlines potential enhancements and features that could be added t
   - Historical data retention
 - **Format**: Prometheus metrics exporter endpoint
 
-### 13. Scheduled Checks with Different Intervals
+### 15. Scheduled Checks with Different Intervals
 - **Description**: Run different check categories at different intervals
 - **Benefits**:
   - Resource optimization
@@ -115,7 +148,7 @@ This document outlines potential enhancements and features that could be added t
   - More frequent critical checks
 - **Example**: Security checks hourly, updates daily, SMART weekly
 
-### 14. Network Scan Mode
+### 16. Network Scan Mode
 - **Description**: Scan multiple servers from central location
 - **Benefits**:
   - Agentless monitoring option
@@ -123,7 +156,7 @@ This document outlines potential enhancements and features that could be added t
   - Central control
 - **Requirements**: SSH key authentication
 
-### 15. REST API
+### 17. REST API
 - **Description**: RESTful API for programmatic access
 - **Benefits**:
   - Integration with custom tools
@@ -133,7 +166,32 @@ This document outlines potential enhancements and features that could be added t
 
 ## Technical Improvements
 
-### 16. Async/Parallel Checks
+### 18. Enhanced Command-Line Arguments
+- **Description**: Comprehensive argparse-based CLI with rich arguments support
+- **Benefits**:
+  - User-friendly interface
+  - Better control over execution
+  - Selective check execution
+  - Flexible configuration
+- **Arguments**:
+  - `--help, -h`: Show help message with all options
+  - `--version, -v`: Display script version
+  - `--config FILE`: Load configuration from file
+  - `--output DIR, -o DIR`: Specify output directory
+  - `--format FORMAT, -f FORMAT`: Export format (md/json/xml/txt)
+  - `--checks TYPE`: Run specific check categories (security/system/storage/network/iscsi)
+  - `--exclude TYPE`: Exclude specific check categories
+  - `--severity LEVEL`: Filter issues by severity (critical/high/medium/low/info)
+  - `--quiet, -q`: Suppress console output (logs only)
+  - `--verbose, -V`: Enable verbose/debug output
+  - `--dry-run`: Show what would be checked without running
+  - `--no-email`: Skip email delivery even if configured
+  - `--no-encrypt`: Skip GPG encryption even if configured
+  - `--baseline FILE`: Compare against baseline file
+  - `--profile NAME`: Use compliance profile (cis/stig/pci)
+- **Example**: `./linux_health_check.py --checks security,network --format json --output /var/reports`
+
+### 19. Async/Parallel Checks
 - **Description**: Run independent checks concurrently using asyncio
 - **Benefits**:
   - Faster execution
@@ -141,7 +199,7 @@ This document outlines potential enhancements and features that could be added t
   - Reduced total runtime
 - **Impact**: 30-50% faster completion time
 
-### 17. Unit and Integration Tests
+### 20. Unit and Integration Tests
 - **Description**: Comprehensive test suite with mocked commands
 - **Benefits**:
   - Reliable releases
@@ -149,7 +207,7 @@ This document outlines potential enhancements and features that could be added t
   - Contribution confidence
 - **Coverage**: Target 80%+ code coverage
 
-### 18. Verbose/Debug Modes
+### 21. Verbose/Debug Modes
 - **Description**: Detailed logging levels for troubleshooting
 - **Benefits**:
   - Easier debugging
@@ -157,7 +215,7 @@ This document outlines potential enhancements and features that could be added t
   - Issue reporting
 - **Usage**: `linux_health_check.py --verbose` or `--debug`
 
-### 19. Dry-Run Mode
+### 22. Dry-Run Mode
 - **Description**: Show what checks would be performed without running them
 - **Benefits**:
   - Permission validation
@@ -165,7 +223,7 @@ This document outlines potential enhancements and features that could be added t
   - Safe testing
 - **Usage**: `linux_health_check.py --dry-run`
 
-### 20. Report Templates
+### 23. Report Templates
 - **Description**: Customizable report templates (Jinja2)
 - **Benefits**:
   - Branded reports
@@ -175,7 +233,7 @@ This document outlines potential enhancements and features that could be added t
 
 ## Security Enhancements
 
-### 21. Signed Reports
+### 24. Signed Reports
 - **Description**: Cryptographically sign reports for authenticity
 - **Benefits**:
   - Non-repudiation
@@ -183,7 +241,7 @@ This document outlines potential enhancements and features that could be added t
   - Audit trail integrity
 - **Implementation**: GPG signatures included with reports
 
-### 22. Credential Management
+### 25. Credential Management
 - **Description**: Secure credential storage for SMTP and encryption
 - **Benefits**:
   - No plaintext passwords
@@ -191,7 +249,7 @@ This document outlines potential enhancements and features that could be added t
   - Secrets management integration
 - **Options**: HashiCorp Vault, AWS Secrets Manager, keyring
 
-### 23. Rate Limiting & Resource Control
+### 26. Rate Limiting & Resource Control
 - **Description**: Limit CPU/memory usage during checks
 - **Benefits**:
   - Production-safe execution
@@ -201,7 +259,7 @@ This document outlines potential enhancements and features that could be added t
 
 ## Distribution-Specific Improvements
 
-### 24. Enhanced Distribution Support
+### 27. Enhanced Distribution Support
 - **Description**: Better support for additional distributions
 - **Target Distributions**:
   - Alpine Linux
@@ -211,7 +269,7 @@ This document outlines potential enhancements and features that could be added t
   - Gentoo
 - **Benefits**: Broader applicability, cloud platform support
 
-### 25. Cloud Platform Checks
+### 28. Cloud Platform Checks
 - **Description**: Cloud-specific health checks
 - **Platforms**: AWS, Azure, GCP
 - **Checks**:
@@ -222,7 +280,7 @@ This document outlines potential enhancements and features that could be added t
 
 ## Reporting Improvements
 
-### 26. PDF Export
+### 29. PDF Export
 - **Description**: Generate PDF reports with charts and graphs
 - **Benefits**:
   - Executive summaries
@@ -230,14 +288,14 @@ This document outlines potential enhancements and features that could be added t
   - Professional appearance
 - **Library**: ReportLab or WeasyPrint
 
-### 27. Email Attachments with Inline Summary
+### 30. Email Attachments with Inline Summary
 - **Description**: HTML email with summary and detailed attachment
 - **Benefits**:
   - Quick overview without downloading
   - Mobile-friendly
   - Better user experience
 
-### 28. Diff Reports
+### 31. Diff Reports
 - **Description**: Show only changes since last run
 - **Benefits**:
   - Focus on new issues
@@ -245,7 +303,7 @@ This document outlines potential enhancements and features that could be added t
   - Change tracking
 - **Usage**: `linux_health_check.py --diff-since yesterday`
 
-### 29. Executive Summary Mode
+### 32. Executive Summary Mode
 - **Description**: High-level summary for management
 - **Benefits**:
   - Quick status overview
@@ -255,7 +313,7 @@ This document outlines potential enhancements and features that could be added t
 
 ## Community & Ecosystem
 
-### 30. Ansible/Puppet/Chef Modules
+### 33. Ansible/Puppet/Chef Modules
 - **Description**: Configuration management integration
 - **Benefits**:
   - Easier deployment
@@ -263,14 +321,14 @@ This document outlines potential enhancements and features that could be added t
   - Infrastructure as code
 - **Implementation**: Galaxy/Forge module
 
-### 31. Documentation Expansion
+### 34. Documentation Expansion
 - **Description**: Video tutorials, architecture diagrams, runbooks
 - **Benefits**:
   - Easier onboarding
   - Community growth
   - Better understanding
 
-### 32. Check Library/Marketplace
+### 35. Check Library/Marketplace
 - **Description**: Community repository of custom checks
 - **Benefits**:
   - Share knowledge
