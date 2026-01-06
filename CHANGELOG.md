@@ -7,13 +7,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-01-06
+
+### Added
+- **Automated version checking** - Queries GitHub Releases API to detect newer versions
+  - INFO-level notification when update is available
+  - Includes wget download command and changelog link
+  - 3-second timeout prevents hanging on slow networks
+  - Silent failure on network errors (doesn't break health checks)
+  - Can be disabled with `DISABLE_VERSION_CHECK=1` environment variable
+  - Configurable timeout via `VERSION_CHECK_TIMEOUT` (default: 3 seconds)
+- **New environment variables**:
+  - `DISABLE_VERSION_CHECK` - Set to `1` to opt out of version checking
+  - `VERSION_CHECK_TIMEOUT` - API request timeout in seconds
+
+### Security
+- Version check uses HTTPS with certificate validation
+- No auto-update functionality (manual upgrade required for security)
+- Rate limit: 60 requests/hour (GitHub API unauthenticated limit)
+- All version check errors fail silently (logged at DEBUG level only)
+
+### Changed
+- Bumped version number from `1.0.0` to `1.1.0` (continuing to follow Semantic Versioning)
+- Script now displays version `1.1.0` instead of `1.0.0`
+
 ## [1.0.0] - 2026-01-06
 
 ### Added
 
 #### Core Features
 - **35+ automated health and security checks** across 6 categories
-- **Zero-dependency design** - Uses only Python 3.8+ standard library
+- **Zero-dependency design** - Uses only Python 3.6+ standard library
 - **Multi-format export** - Markdown (default), JSON, XML, plain text
 - **GPG encryption support** - Protect sensitive health reports
 - **SMTP email delivery** - Send reports via email with attachments

@@ -52,24 +52,25 @@ This document outlines potential enhancements and features that could be added t
 
 ## Medium Priority Enhancements
 
-### 6. Automated Update Checking
+### 6. ✅ Automated Update Checking (Implemented in v1.1.0)
+- **Status**: **COMPLETED** - Released in version 1.1.0 (2026-01-06)
 - **Description**: Check for new script versions and notify administrators
-- **Benefits**:
-  - Stay current with security patches
-  - Receive bug fixes automatically
-  - Get notified of new features
-  - Maintain best practices
 - **Implementation**:
-  - Check GitHub releases API for newer versions
-  - Compare semantic versions (current vs latest)
-  - Optional auto-update with `--auto-update` flag
-  - Update check frequency configurable (daily/weekly)
-  - Notify via report or separate alert
-- **Safety**: 
-  - Verify GPG signatures before updating
-  - Backup current version before upgrade
-  - Rollback capability if update fails
-- **Usage**: `linux_health_check.py --check-updates` or automatic on run
+  - ✅ Checks GitHub Releases API for newer versions
+  - ✅ Compares semantic versions (current vs latest)
+  - ✅ Shows INFO-level notification in health reports
+  - ✅ Includes wget download command and changelog link
+  - ✅ 3-second timeout prevents hanging
+  - ✅ Silent failure on network errors
+  - ✅ Can be disabled with `DISABLE_VERSION_CHECK=1`
+  - ✅ Configurable timeout via `VERSION_CHECK_TIMEOUT`
+- **Differences from Original Proposal**:
+  - ❌ No auto-update functionality (manual upgrade only for security/stability)
+  - ❌ No GPG signature verification (not implemented)
+  - ❌ No update frequency configuration (checks on every run)
+  - ✅ Simpler, safer implementation using stdlib only
+- **Usage**: Automatic on every run, or disable with `DISABLE_VERSION_CHECK=1`
+- **Documentation**: See README.md "Automated Update Checking" section
 
 ### 7. Baseline Comparison
 - **Description**: Compare current state against known-good baseline

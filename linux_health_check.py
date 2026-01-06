@@ -6,7 +6,7 @@ Description: Comprehensive health and security audit for Linux systems
 License: MIT
 """
 
-__version__ = "1.0.0"
+__version__ = "1.1.0"
 
 import os
 import sys
@@ -23,6 +23,8 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from email.mime.base import MIMEBase
 from email import encoders
+import urllib.request
+import urllib.error
 
 # ============================================================================
 # CONFIGURATION
@@ -55,6 +57,18 @@ MEMORY_WARNING_THRESHOLD = 85
 MEMORY_CRITICAL_THRESHOLD = 95
 LOAD_WARNING_MULTIPLIER = 0.7
 LOAD_CRITICAL_MULTIPLIER = 1.0
+
+# Version Checking Configuration
+GITHUB_REPO = "0xgruber/linux-health-checks"
+timeout_env = os.getenv("VERSION_CHECK_TIMEOUT")
+try:
+    VERSION_CHECK_TIMEOUT = int(timeout_env) if timeout_env is not None else 3
+except ValueError:
+    logging.warning(
+        "Invalid VERSION_CHECK_TIMEOUT value %r; falling back to default 3 seconds",
+        timeout_env,
+    )
+    VERSION_CHECK_TIMEOUT = 3
 
 # ============================================================================
 # GLOBAL STATE
@@ -158,6 +172,215 @@ def add_issue(severity, category, description, details=None):
     )
     if details:
         logger.info(f"  Details: {details}")
+
+
+# ============================================================================
+# VERSION CHECKING
+# ============================================================================
+
+
+def parse_semantic_version(version_string):
+    """
+    Parse semantic version string into tuple of integers.
+
+    Args:
+        version_string: Version in format "X.Y.Z" or "vX.Y.Z"
+
+    Returns:
+        Tuple of (major, minor, patch) or None if invalid
+
+    Examples:
+        >>> parse_semantic_version("1.2.3")
+        (1, 2, 3)
+        >>> parse_semantic_version("v1.2.3")
+        (1, 2, 3)
+        >>> parse_semantic_version("invalid")
+        None
+    """
+    try:
+        # Strip 'v' prefix if present
+        version = version_string.lstrip("v")
+
+        # Split on '.' and convert to integers
+        parts = version.split(".")
+
+        # Must have exactly 3 parts (MAJOR.MINOR.PATCH)
+        if len(parts) != 3:
+            return None
+
+        major, minor, patch = [int(p) for p in parts]
+
+        # Validate non-negative
+        if major < 0 or minor < 0 or patch < 0:
+            return None
+
+        return (major, minor, patch)
+
+    except (ValueError, AttributeError):
+        return None
+
+
+def compare_versions(current, latest):
+    """
+    Compare two semantic version tuples.
+
+    Args:
+        current: Current version tuple (major, minor, patch)
+        latest: Latest version tuple (major, minor, patch)
+
+    Returns:
+        -1 if current < latest (update available)
+         0 if current == latest (up to date)
+         1 if current > latest (dev version)
+
+    Examples:
+        >>> compare_versions((1, 0, 0), (1, 1, 0))
+        -1
+        >>> compare_versions((1, 1, 0), (1, 1, 0))
+        0
+        >>> compare_versions((1, 2, 0), (1, 1, 0))
+        1
+    """
+    # Python tuple comparison handles semantic versioning naturally
+    if current < latest:
+        return -1
+    elif current == latest:
+        return 0
+    else:
+        return 1
+
+
+def check_github_releases():
+    """
+    Query GitHub Releases API for latest version.
+
+    Returns:
+        Tuple of (version, release_url, changelog_url) on success
+        Tuple of (None, None, None) on failure
+
+    Environment Variables:
+        DISABLE_VERSION_CHECK: Set to "1" to skip check
+        VERSION_CHECK_TIMEOUT: Timeout in seconds (default: 3)
+    """
+    # Check if version checking is disabled
+    if os.getenv("DISABLE_VERSION_CHECK", "0") == "1":
+        logger.debug("Version check disabled via DISABLE_VERSION_CHECK")
+        return None, None, None
+
+    # Build API URL
+    api_url = f"https://api.github.com/repos/{GITHUB_REPO}/releases/latest"
+
+    # Get timeout from configuration
+    timeout = VERSION_CHECK_TIMEOUT
+
+    try:
+        # Create request with User-Agent header
+        headers = {
+            "User-Agent": f"linux-health-check/{__version__}",
+            "Accept": "application/vnd.github.v3+json",
+        }
+        request = urllib.request.Request(api_url, headers=headers)
+
+        # Fetch with timeout
+        logger.debug(f"Fetching latest release from: {api_url}")
+        with urllib.request.urlopen(request, timeout=timeout) as response:
+            data = json.loads(response.read().decode("utf-8"))
+
+        # Parse response
+        tag_name = data.get("tag_name", "")
+        version = tag_name.lstrip("v")  # Remove 'v' prefix
+        release_url = data.get("html_url", "")
+        changelog_url = release_url  # Same as release URL
+
+        logger.debug(f"Latest version: {version}")
+        return version, release_url, changelog_url
+
+    except urllib.error.HTTPError as e:
+        # HTTP errors (404, 403, etc.)
+        logger.debug(f"GitHub API HTTP error: {e.code} {e.reason}")
+        return None, None, None
+
+    except urllib.error.URLError as e:
+        # Network errors (no connection, DNS failure, etc.)
+        logger.debug(f"GitHub API network error: {e.reason}")
+        return None, None, None
+
+    except json.JSONDecodeError as e:
+        # Invalid JSON response
+        logger.debug(f"GitHub API JSON parse error: {e}")
+        return None, None, None
+
+    except Exception as e:
+        # Catch-all for any other errors
+        logger.debug(f"GitHub API unexpected error: {e}")
+        return None, None, None
+
+
+def check_version_update():
+    """
+    Check for script updates and add notification issue if available.
+
+    This function queries the GitHub Releases API to check if a newer version
+    is available. If found, it adds an INFO-level issue with upgrade instructions.
+    All errors fail silently and do not interrupt health checks.
+    """
+    # Query GitHub API for latest release
+    latest_version_str, release_url, changelog_url = check_github_releases()
+
+    # If check failed or disabled, return without adding issue
+    if not latest_version_str:
+        logger.debug("Version check skipped or failed")
+        return
+
+    # Parse versions
+    current_version = parse_semantic_version(__version__)
+    latest_version = parse_semantic_version(latest_version_str)
+
+    # Handle parsing errors
+    if not current_version or not latest_version:
+        logger.debug("Failed to parse version strings")
+        return
+
+    # Compare versions
+    comparison = compare_versions(current_version, latest_version)
+
+    if comparison < 0:
+        # Update available
+        logger.info(
+            f"New version available: {latest_version_str} (current: {__version__})"
+        )
+
+        # Build download URL
+        download_url = f"https://github.com/{GITHUB_REPO}/releases/download/v{latest_version_str}/linux_health_check.py"
+
+        # Format issue details
+        details = (
+            f"A newer version of this script is available.\n"
+            f"\n"
+            f"Upgrade instructions:\n"
+            f"  wget {download_url}\n"
+            f"  chmod +x linux_health_check.py\n"
+            f"\n"
+            f"Changelog: {changelog_url}"
+        )
+
+        # Add INFO-level issue
+        add_issue(
+            severity="INFO",
+            category="Version Update",
+            description=f"New version available: {latest_version_str} (current: {__version__})",
+            details=details,
+        )
+
+    elif comparison == 0:
+        # Up to date
+        logger.debug(f"Script is up to date (version {__version__})")
+
+    else:
+        # Running dev/future version
+        logger.debug(
+            f"Running dev/future version {__version__} (latest: {latest_version_str})"
+        )
 
 
 # ============================================================================
@@ -1779,6 +2002,11 @@ def main():
 
     # Detect OS
     detect_os()
+    logger.info("")
+
+    # Check for script updates
+    logger.info("Checking for script updates...")
+    check_version_update()
     logger.info("")
 
     # Security Checks
