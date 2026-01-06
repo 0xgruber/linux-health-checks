@@ -51,8 +51,10 @@ try:
     if os.path.exists(_config_file):
         # Check file permissions
         _file_stat = os.stat(_config_file)
-        if _file_stat.st_mode & (stat.S_IRGRP | stat.S_IROTH):
-            print("⚠️  WARNING: Config file is readable by others")
+        if _file_stat.st_mode & (
+            stat.S_IRGRP | stat.S_IROTH | stat.S_IWGRP | stat.S_IWOTH
+        ):
+            print("⚠️  WARNING: Config file is readable or writable by others")
             print("   Consider: chmod 600 health_check_config.py")
 
         # Load config module
