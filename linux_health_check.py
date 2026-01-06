@@ -41,6 +41,7 @@ import urllib.error
 # ============================================================================
 
 # Try to load user configuration
+_config = None  # Initialize to prevent NameError if config loading fails
 try:
     import importlib.util
     import stat
