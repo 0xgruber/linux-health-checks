@@ -1,6 +1,6 @@
 # Linux Health Checks
 
-[![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](https://github.com/0xgruber/linux-health-checks/releases)
+[![Version](https://img.shields.io/badge/version-1.1.0-blue.svg)](https://github.com/0xgruber/linux-health-checks/releases)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/python-3.8%2B-blue.svg)](https://www.python.org/)
 [![Debian](https://img.shields.io/badge/Debian-12%20%7C%2013-red.svg)](https://www.debian.org/)
@@ -12,7 +12,7 @@
 Comprehensive cross-distribution health and security audit script for Linux servers. The script performs 35+ distinct checks across security, system health, storage, packages, networking, and iSCSI, ranks findings by severity (Critical/High/Medium/Low/Info), and produces exportable reports with optional GPG encryption and email delivery.
 
 **Author:** Aaron Gruber <aaron@gizmobear.io>  
-**Version:** 1.0.0 ([Semantic Versioning](https://semver.org/))  
+**Version:** 1.1.0 ([Semantic Versioning](https://semver.org/))  
 **License:** MIT  
 **Repository:** https://github.com/0xgruber/linux-health-checks
 
@@ -136,16 +136,48 @@ This project follows **[Semantic Versioning 2.0.0](https://semver.org/)** (SemVe
 - **MINOR** version (1.X.0): New features, backward-compatible functionality
 - **PATCH** version (1.0.X): Bug fixes, security patches, documentation updates
 
-**Current Version:** 1.0.0 (First stable release)
+**Current Version:** 1.1.0
 
 View all releases and changelog: https://github.com/0xgruber/linux-health-checks/releases
+
+### Automated Update Checking
+
+The script automatically checks for newer versions by querying the GitHub Releases API. If a newer version is available, an **INFO-level notification** is included in the health check report with upgrade instructions.
+
+**Features:**
+- Checks GitHub Releases API on every execution
+- 3-second timeout (prevents hanging on slow networks)
+- Silent failure (network errors don't break health checks)
+- INFO-level severity (non-intrusive notification)
+- Manual upgrade only (no auto-update functionality)
+
+**Configuration:**
+
+Disable version checking:
+```bash
+DISABLE_VERSION_CHECK=1 sudo ./linux_health_check.py
+```
+
+Custom API timeout (default: 3 seconds):
+```bash
+VERSION_CHECK_TIMEOUT=5 sudo ./linux_health_check.py
+```
+
+**Rate Limits:**  
+GitHub API allows 60 requests/hour for unauthenticated requests. If you run the script more frequently than this, consider disabling version checks with `DISABLE_VERSION_CHECK=1`.
+
+**Security:**
+- Uses HTTPS with certificate validation
+- No credentials required (public API)
+- No auto-update (manual download and verification required)
+- All errors fail silently and are logged at DEBUG level only
 
 ## Requirements
 
 ### Python Environment
 - Python 3.8 or higher
 - Standard library only - no pip dependencies required
-- Modules used: `os`, `re`, `subprocess`, `sys`, `logging`, `pathlib`, `json`, `xml.etree.ElementTree`, `datetime`, `collections`, `typing`, `smtplib`, `email`
+- Modules used: `os`, `re`, `subprocess`, `sys`, `logging`, `pathlib`, `json`, `xml.etree.ElementTree`, `datetime`, `collections`, `typing`, `smtplib`, `email`, `urllib.request`, `urllib.error`
 
 ### System Utilities
 The script gracefully handles missing commands but coverage is maximized with:
