@@ -3,8 +3,9 @@
 Comprehensive cross-distribution health and security audit script for Linux servers. The script performs 35+ distinct checks across security, system health, storage, packages, networking, and iSCSI, ranks findings by severity (Critical/High/Medium/Low/Info), and produces exportable reports with optional GPG encryption and email delivery.
 
 **Author:** Aaron Gruber <aaron@gizmobear.io>  
-**Version:** 2.1  
-**License:** See repository metadata
+**Version:** 2026.01.05 (Date-based versioning: YYYY.MM.DD)  
+**License:** MIT  
+**Repository:** https://github.com/0xgruber/linux-health-checks
 
 ## Key Features
 
@@ -70,6 +71,45 @@ Automatically detects and adapts to:
 - GPG encryption support for sensitive reports
 - SMTP email delivery with attachments
 
+## Installation
+
+### From GitHub Releases
+
+Download the latest release:
+
+```bash
+# Download the latest version
+wget https://github.com/0xgruber/linux-health-checks/releases/latest/download/linux_health_check.py
+
+# Make executable
+chmod +x linux_health_check.py
+
+# Run the script
+sudo ./linux_health_check.py
+```
+
+### From Source
+
+```bash
+# Clone the repository
+git clone https://github.com/0xgruber/linux-health-checks.git
+cd linux-health-checks
+
+# Make executable
+chmod +x linux_health_check.py
+
+# Run the script
+sudo ./linux_health_check.py
+```
+
+### Release Versioning
+
+This project uses **date-based versioning** in the format `YYYY.MM.DD` (e.g., `2026.01.05`). 
+
+- New releases are automatically created via GitHub Actions
+- Each release includes the script, archives (tar.gz, zip), and checksums
+- View all releases: https://github.com/0xgruber/linux-health-checks/releases
+
 ## Requirements
 
 ### Python Environment
@@ -116,7 +156,9 @@ The script gracefully handles missing commands but coverage is maximized with:
 
 ## Configuration
 
-Edit the constants at the top of `linux_health_check.py` (lines 45-66) before running:
+Edit the constants at the top of `linux_health_check.py` (lines 20-40) before running:
+
+> **Note:** Future releases will support external configuration files. See [IMPROVEMENTS.md](IMPROVEMENTS.md) for planned enhancements.
 
 ### Output Directory
 ```python
@@ -446,6 +488,60 @@ df -h /root
 5. Verify GPG encryption didn't fail (check for `.gpg` file in OUTPUT_DIR)
 6. Look for errors in script output or `/var/log/linux_health_check.log`
 
+## Contributing
+
+We welcome contributions! See [IMPROVEMENTS.md](IMPROVEMENTS.md) for a list of planned enhancements.
+
+### How to Contribute
+
+1. **Fork the repository** on GitHub
+2. **Create a feature branch**: `git checkout -b feature/your-feature-name`
+3. **Make your changes** with clear, descriptive commits
+4. **Test thoroughly** on multiple distributions if possible
+5. **Submit a pull request** with a detailed description
+
+### Development Guidelines
+
+- Maintain Python 3.8+ compatibility
+- No external pip dependencies (stdlib only)
+- Follow existing code style and patterns
+- Add tests for new functionality when possible
+- Update documentation (README.md, comments)
+- Consider cross-distribution compatibility
+
+### Reporting Issues
+
+Found a bug or have a feature request?
+
+1. Check existing issues: https://github.com/0xgruber/linux-health-checks/issues
+2. Create a new issue with:
+   - Clear description of the problem/request
+   - Steps to reproduce (for bugs)
+   - Your distribution and version
+   - Relevant log output or error messages
+
+## Releases
+
+This project uses automated date-based releases (YYYY.MM.DD format). View all releases at:
+https://github.com/0xgruber/linux-health-checks/releases
+
+Each release includes:
+- Standalone script file
+- Source code archives (tar.gz, zip)
+- SHA256 checksums
+- Release notes with changes
+
+## Future Enhancements
+
+See [IMPROVEMENTS.md](IMPROVEMENTS.md) for planned features including:
+- Configuration file support
+- Custom check plugins
+- Historical tracking and trending
+- Web dashboard
+- Compliance profiles (CIS, STIG, PCI-DSS)
+- Container security checks
+- And many more...
+
 ## License
-See repository metadata for licensing details.
+MIT License - See repository for details.
 

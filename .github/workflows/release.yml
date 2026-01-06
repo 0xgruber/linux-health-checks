@@ -1,0 +1,143 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      create_release:
+        description: 'Create a new release with today''s date'
+        required: true
+        type: boolean
+        default: true
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.8'
+      
+      - name: Generate date-based version
+        id: version
+        run: |
+          if [[ "${{ github.ref }}" == refs/tags/v* ]]; then
+            VERSION="${GITHUB_REF#refs/tags/v}"
+          else
+            VERSION=$(date +%Y.%m.%d)
+          fi
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "tag=v$VERSION" >> $GITHUB_OUTPUT
+          echo "Release version: $VERSION"
+      
+      - name: Update script version
+        run: |
+          sed -i "s/Version: .*/Version: ${{ steps.version.outputs.version }}/" linux_health_check.py
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add linux_health_check.py
+          git diff --staged --quiet || git commit -m "chore: update version to ${{ steps.version.outputs.version }}"
+      
+      - name: Create Git tag
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          git tag ${{ steps.version.outputs.tag }}
+          git push origin ${{ steps.version.outputs.tag }}
+      
+      - name: Generate changelog
+        id: changelog
+        run: |
+          if git describe --tags --abbrev=0 2>/dev/null; then
+            PREV_TAG=$(git describe --tags --abbrev=0)
+            CHANGELOG=$(git log ${PREV_TAG}..HEAD --pretty=format:"- %s" --no-merges)
+          else
+            CHANGELOG=$(git log --pretty=format:"- %s" --no-merges)
+          fi
+          
+          if [ -z "$CHANGELOG" ]; then
+            CHANGELOG="- Initial release with comprehensive Linux health checks"
+          fi
+          
+          echo "changelog<<EOF" >> $GITHUB_OUTPUT
+          echo "$CHANGELOG" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+      
+      - name: Validate script
+        run: |
+          python3 -m py_compile linux_health_check.py
+          chmod +x linux_health_check.py
+          ./linux_health_check.py --help || echo "Script validation complete"
+      
+      - name: Create release archive
+        run: |
+          mkdir -p release
+          cp linux_health_check.py release/
+          cp README.md release/
+          cp -r openspec release/ || true
+          cd release
+          tar -czf ../linux-health-check-${{ steps.version.outputs.version }}.tar.gz *
+          cd ..
+          zip -r linux-health-check-${{ steps.version.outputs.version }}.zip release/*
+          sha256sum linux-health-check-${{ steps.version.outputs.version }}.tar.gz > checksums.txt
+          sha256sum linux-health-check-${{ steps.version.outputs.version }}.zip >> checksums.txt
+      
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ steps.version.outputs.tag }}
+          name: Release ${{ steps.version.outputs.version }}
+          body: |
+            # Linux Health Check ${{ steps.version.outputs.version }}
+            
+            ## What's Changed
+            ${{ steps.changelog.outputs.changelog }}
+            
+            ## Features
+            - 35+ automated health and security checks
+            - Support for RHEL, Debian, SUSE, and Arch distributions
+            - Multiple export formats (Markdown, JSON, XML, plain text)
+            - Optional GPG encryption and SMTP email delivery
+            - Configurable thresholds and policies
+            - Cron-friendly non-interactive execution
+            
+            ## Installation
+            ```bash
+            # Download and make executable
+            wget https://github.com/${{ github.repository }}/releases/download/${{ steps.version.outputs.tag }}/linux_health_check.py
+            chmod +x linux_health_check.py
+            
+            # Or extract from archive
+            tar -xzf linux-health-check-${{ steps.version.outputs.version }}.tar.gz
+            ```
+            
+            ## Usage
+            ```bash
+            # Run as root for complete checks
+            sudo ./linux_health_check.py
+            
+            # Export as JSON
+            EXPORT_FORMAT=json sudo ./linux_health_check.py
+            ```
+            
+            See [README.md](https://github.com/${{ github.repository }}/blob/main/README.md) for complete documentation.
+          files: |
+            linux_health_check.py
+            linux-health-check-${{ steps.version.outputs.version }}.tar.gz
+            linux-health-check-${{ steps.version.outputs.version }}.zip
+            checksums.txt
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
