@@ -1,6 +1,6 @@
 # Linux Health Checks
 
-[![Version](https://img.shields.io/badge/version-1.2.0-blue.svg)](https://github.com/0xgruber/linux-health-checks/releases)
+[![Version](https://img.shields.io/badge/version-1.2.3-blue.svg)](https://github.com/0xgruber/linux-health-checks/releases)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/python-3.6%2B-blue.svg)](https://www.python.org/)
 [![Debian](https://img.shields.io/badge/Debian-12%20%7C%2013-red.svg)](https://www.debian.org/)
@@ -12,7 +12,7 @@
 Comprehensive cross-distribution health and security audit script for Linux servers. The script performs 35+ distinct checks across security, system health, storage, packages, networking, and iSCSI, ranks findings by severity (Critical/High/Medium/Low/Info), and produces exportable reports with optional GPG encryption and email delivery.
 
 **Author:** Aaron Gruber <aaron@gizmobear.io>  
-**Version:** 1.2.0 ([Semantic Versioning](https://semver.org/))  
+**Version:** 1.2.3 ([Semantic Versioning](https://semver.org/))  
 **License:** MIT  
 **Repository:** https://github.com/0xgruber/linux-health-checks
 

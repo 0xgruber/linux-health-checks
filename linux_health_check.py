@@ -6,7 +6,7 @@ Description: Comprehensive health and security audit for Linux systems
 License: MIT
 """
 
-__version__ = "1.2.2"
+__version__ = "1.2.3"
 
 import os
 import sys
