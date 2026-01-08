@@ -86,7 +86,6 @@ jobs:
           cp linux_health_check.py release/
           cp health_check.cfg.example release/
           cp README.md release/
-          cp -r openspec release/ || true
           cd release
           tar -czf ../linux-health-check-${{ steps.version.outputs.version }}.tar.gz *
           cd ..
