@@ -1,6 +1,6 @@
 # Linux Health Checks
 
-[![Version](https://img.shields.io/badge/version-1.2.3-blue.svg)](https://github.com/0xgruber/linux-health-checks/releases)
+[![Version](https://img.shields.io/badge/version-1.3.0-blue.svg)](https://github.com/0xgruber/linux-health-checks/releases)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/python-3.6%2B-blue.svg)](https://www.python.org/)
 [![Debian](https://img.shields.io/badge/Debian-12%20%7C%2013-red.svg)](https://www.debian.org/)
@@ -12,7 +12,7 @@
 Comprehensive cross-distribution health and security audit script for Linux servers. The script performs 35+ distinct checks across security, system health, storage, packages, networking, and iSCSI, ranks findings by severity (Critical/High/Medium/Low/Info), and produces exportable reports with optional GPG encryption and email delivery.
 
 **Author:** Aaron Gruber <aaron@gizmobear.io>  
-**Version:** 1.2.3 ([Semantic Versioning](https://semver.org/))  
+**Version:** 1.3.0 ([Semantic Versioning](https://semver.org/))  
 **License:** MIT  
 **Repository:** https://github.com/0xgruber/linux-health-checks
 
@@ -417,7 +417,12 @@ EXPORT_FORMAT=text ./linux_health_check.py
 When `GPG_ENABLED=True` and `GPG_RECIPIENT` is set:
 - Creates `.gpg` extension file (ASCII armored)
 - Uses `--trust-model always` to avoid prompts
-- Original plaintext file is retained
+- Original plaintext report is deleted if `delete_unencrypted=true` (recommended for security)
+- **⚠️ Breaking change in v1.3.0**: Log file (`health_report.txt`) is now also deleted when `delete_unencrypted=true`
+  - **Before v1.3.0**: Only the markdown report was deleted
+  - **After v1.3.0**: Both the markdown report AND the log file are deleted
+  - **Why**: Prevents plain text vulnerability data from persisting on disk
+  - **Impact**: If you need to keep the log file, set `delete_unencrypted=false` in your configuration
 
 ### Email Attachments
 Email delivery includes:

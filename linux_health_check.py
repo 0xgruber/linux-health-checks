@@ -6,7 +6,7 @@ Description: Comprehensive health and security audit for Linux systems
 License: MIT
 """
 
-__version__ = "1.2.3"
+__version__ = "1.3.0"
 
 import os
 import sys
@@ -2003,8 +2003,10 @@ def encrypt_file_gpg(file_path):
 
     if rc == 0:
         logger.info(f"File encrypted successfully: {encrypted_path}")
-        # Remove unencrypted file
-        os.remove(file_path)
+        # Remove unencrypted file if configured
+        if GPG_DELETE_UNENCRYPTED:
+            os.remove(file_path)
+            logger.info(f"Deleted unencrypted file: {file_path}")
         return encrypted_path
     else:
         logger.error(f"GPG encryption failed: {stderr}")
@@ -2193,6 +2195,15 @@ def main():
     # Send email if configured
     if EMAIL_ENABLED:
         send_email_report(report_file)
+
+    # Delete unencrypted log file if GPG encryption and deletion are enabled
+    if GPG_ENABLED and GPG_DELETE_UNENCRYPTED:
+        if os.path.exists(OUTPUT_FILE):
+            try:
+                os.remove(OUTPUT_FILE)
+                logger.info(f"Deleted unencrypted log file: {OUTPUT_FILE}")
+            except Exception as e:
+                logger.warning(f"Failed to delete unencrypted log file: {e}")
 
     # Summary
     logger.info("")
