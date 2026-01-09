@@ -1,3 +1,5 @@
+name: CI - Conditional Testing
+
 on:
   pull_request:
 
@@ -5,7 +7,6 @@ jobs:
   validation:
     name: validation
     runs-on: ubuntu-latest
-    outputs: {}
     steps:
       - name: Quick validation
         run: |
