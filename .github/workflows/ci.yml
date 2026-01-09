@@ -3,6 +3,9 @@ name: CI - Conditional Testing
 on:
   pull_request:
 
+permissions:
+  contents: read
+
 jobs:
   validation:
     name: validation
