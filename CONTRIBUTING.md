@@ -3,11 +3,27 @@
 Thank you for your interest in contributing! This document provides guidelines for contributing to the project.
 
 ## Table of Contents
+- [Pull Request Conventions](#pull-request-conventions)
 - [Versioning Strategy](#versioning-strategy)
 - [Release Process](#release-process)
 - [Development Workflow](#development-workflow)
 - [Testing Requirements](#testing-requirements)
 - [Code Style](#code-style)
+
+---
+
+## Pull Request Conventions
+
+### Chore PRs (Skip Heavy Tests)
+
+If your change only updates documentation, fixes typos, or performs other non-functional chores, please prefix your pull request title with `chore:` (case-insensitive). Pull requests with titles starting with `chore:` will skip the repository's heavy CI jobs, while still running a lightweight validation check required by branch protection.
+
+**Examples:**
+- `chore: fix typo in README`
+- `chore: update CONTRIBUTING guide`
+- `Chore: formatting cleanup`
+
+**Note:** This convention helps preserve CI resources while maintaining branch protection requirements. Non-chore PRs will run the full test suite across all supported distributions.
 
 ---
 
