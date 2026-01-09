@@ -1,0 +1,27 @@
+on:
+  pull_request:
+
+jobs:
+  validation:
+    name: validation
+    runs-on: ubuntu-latest
+    outputs: {}
+    steps:
+      - name: Quick validation
+        run: |
+          echo "Lightweight validation — always run to satisfy branch protection"
+          # Optional: run fast linters or formatting checks here
+
+  heavy-tests:
+    name: heavy-tests
+    needs: validation
+    runs-on: ubuntu-latest
+    if: >-
+      !startsWith(toLower(github.event.pull_request.title), 'chore')
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Run heavy tests
+        run: |
+          echo "Running heavy tests..."
+          # TODO: replace with repo-specific test commands, e.g. `make test`, `pytest`, etc.

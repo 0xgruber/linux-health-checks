@@ -3,11 +3,24 @@
 Thank you for your interest in contributing! This document provides guidelines for contributing to the project.
 
 ## Table of Contents
+- [Pull Request Title Convention](#pull-request-title-convention)
 - [Versioning Strategy](#versioning-strategy)
 - [Release Process](#release-process)
 - [Development Workflow](#development-workflow)
 - [Testing Requirements](#testing-requirements)
 - [Code Style](#code-style)
+
+---
+
+## Pull Request Title Convention
+
+If your change only updates documentation, fixes typos, or performs other non-functional chores, please prefix your pull request title with `chore:` (case-insensitive). Pull requests with titles starting with `chore:` will skip the repository's heavy CI jobs, while still running a lightweight validation check required by branch protection.
+
+Examples:
+- `chore: fix typo in README`
+- `Chore: update docs for new command`
+
+If your change modifies code, tests, or build configuration, do not use the `chore:` prefix — heavy CI jobs will run as usual.
 
 ---
 
