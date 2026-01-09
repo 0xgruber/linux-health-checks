@@ -7,6 +7,49 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.0] - 2026-01-08
+
+### Fixed
+- **CRITICAL SECURITY FIX**: Unencrypted log file (`health_report.txt`) is now deleted when `delete_unencrypted=true` in GPG configuration
+  - **Issue**: Plain text log file containing vulnerability data was left on disk even with `delete_unencrypted=true`
+  - **Impact**: Sensitive security findings were exposed in plain text, creating a security vulnerability
+  - **Resolution**: Log file is now properly deleted after email delivery when GPG cleanup is enabled
+  - **Breaking Change**: Users with `delete_unencrypted=true` will lose the log file after execution
+    - If you need to preserve the log file for debugging, set `delete_unencrypted=false` in your configuration
+  - **Location**: `linux_health_check.py:2199-2206`
+
+### Changed
+- GPG `delete_unencrypted` flag now properly respected for markdown reports
+  - **Previous behavior**: Markdown report was always deleted after encryption (unconditional)
+  - **New behavior**: Markdown report only deleted if `delete_unencrypted=true`
+  - **Location**: `linux_health_check.py:2007-2009`
+- Enhanced error handling for log file deletion with try/except block
+
+### Security
+- Prevents plain text vulnerability data from persisting on disk when GPG encryption is enabled
+- Honors user's security intent when `delete_unencrypted=true` is configured
+- Improves compliance with data protection regulations
+
+## [1.2.3] - 2026-01-08
+
+### Fixed
+- Synchronized version references across all files (README.md, linux_health_check.py)
+- Version badge and version field in README.md updated from 1.2.0 → 1.2.3
+
+## [1.2.2] - 2026-01-08
+
+### Fixed
+- Removed `openspec/` directory from release archives
+- Modified release workflow to exclude internal development documentation
+- Archives now only contain user-facing files
+
+## [1.2.1] - 2026-01-08
+
+### Fixed
+- Made test suite version-agnostic to prevent future CI/CD failures on version bumps
+- Updated `test_suite.sh` to use regex patterns instead of hardcoded version numbers
+- Added missing `health_check.cfg.example` to release assets
+
 ## [1.1.0] - 2026-01-06
 
 ### Added
@@ -157,5 +200,10 @@ This is the **first stable release** (1.0.0) of the Linux Health Check script, m
 - Some checks require specific tools (e.g., smartctl for SMART status)
 - SELinux checks limited to policy enforcement status (no deep analysis)
 
-[Unreleased]: https://github.com/0xgruber/linux-health-checks/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/0xgruber/linux-health-checks/compare/v1.3.0...HEAD
+[1.3.0]: https://github.com/0xgruber/linux-health-checks/releases/tag/v1.3.0
+[1.2.3]: https://github.com/0xgruber/linux-health-checks/releases/tag/v1.2.3
+[1.2.2]: https://github.com/0xgruber/linux-health-checks/releases/tag/v1.2.2
+[1.2.1]: https://github.com/0xgruber/linux-health-checks/releases/tag/v1.2.1
+[1.1.0]: https://github.com/0xgruber/linux-health-checks/releases/tag/v1.1.0
 [1.0.0]: https://github.com/0xgruber/linux-health-checks/releases/tag/v1.0.0
